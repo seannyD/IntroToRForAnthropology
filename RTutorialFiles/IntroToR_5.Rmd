@@ -1,0 +1,165 @@
+---
+title: "R Tutorial Part 5: Missing values"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    includes:
+      before_body: header.htm
+---
+# Recap
+
+In part 4 we learned:
+
+-  How to apply a function to a column of a data frame to get some basic statistics like `mean()` (average), `sd()` (standard deviation), `max()`, `min()`.
+-  How to apply a t-test to two different samples of numbers.
+-  How to make a linear regression model.
+-  How to create our own functions.
+-  How to use `tapply` to group data and apply a function to each group. For example, to get the mean latitude for each language family:
+
+```{r eval=F}
+tapply(d2$latitude, d2$glotto.family, mean)
+```
+
+We also learned a few basics about plots:
+
+-  How to make basic plots (figures with visual summaries of the data).
+-  How colours work in R.
+-  How to write a plot to a file on your computer (putting the plot code between a call to `pdf()` and `dev.off()`).
+
+
+# Missing values: NA
+
+In this tutorial, we'll cover missing data. A common problem when analysing data is dealing with missing data. Not all rows in your data will have known values, for example the word order of a particular language may not be available.
+
+The variable below is a vector with two missing values ("NA"). A missing value is a *logical constant* which represents "Not available".
+
+```{r}
+x = c(2, 5, 3, NA, 1, NA)
+```
+
+> **Task**: What happens if you try to calculate the sum of this variable?
+
+You get NA returned!  This isn't helpful, but is technically correct - there's no defined sum for missing data.
+
+There are two ways of dealing with this.  First, take out NA values, and we can do this by indexing **x**.  However, you can't use the boolean operators with NAs:
+
+```{r}
+x == NA
+```
+
+Instead, you can use the function `is.na`:
+
+```{r}
+is.na(x)
+```
+
+We want to keep only the values that are **not** NA, so we can negate the booleans with the symbol `!`:
+
+```{r}
+# Vector of booleans that indexes non-NA data:
+!is.na(x)
+# Create a new vector with only non-NA data:
+x2 = x[!is.na(x)]
+sum(x2)
+```
+
+The second option is to use the optional argument `na.rm` (short for 'NA removed') in `sum`.  This argument controls whether NA values should be ignored when calcualting the sum.
+
+```{r}
+sum(x, na.rm=TRUE)
+```
+
+When using this, be sure you know what you are excluding.
+
+NA values can also be problematic when indexing:
+
+```{r}
+# a vector of numbers with 1 NA
+x = c(1,2,NA,4)
+# a vector of characters
+y = c("a",'b','c','d')
+# index y using x
+y2 = y[x]
+y2
+```
+
+Suddenly, y2 includes NA values!
+
+# Data with NA values
+
+In the previous data sets we looked at, there were no missing data. Let's load a file with some missing data. Download <a href="https://raw.githubusercontent.com/seannyD/IntroToRForTheLanguageSciences/master/data/WALS_ObjectVerbOrder.csv" download>this file (WALS_ObjectVerbOrder.csv)</a> into your **data** folder.
+
+This file *WALS_ObjectVerbOrder.csv* contains missing values. Create a new script called "part5.R". Now load the data, like before:
+
+```{r echo=c(2:5)}
+setwd("~/Documents/Teaching/CARDIFF/RCourse/IntroToR/analysis/")
+d = read.csv("../data/WALS_ObjectVerbOrder.csv", stringsAsFactors = F)
+dim(d)
+head(d)
+```
+
+We see that some of the data for the variable **ObjectVerbOrder** is missing, and also some glotto and iso codes.
+
+> **Task**: How many datapoints in ObjectVerbOrder are missing?  How many glottocodes are missing?  Remember that `is.na` creates a vector of booleans and `sum` can count the number of `TRUE` values in a vector.
+
+```{r include=F}
+sum(is.na(d$ObjectVerbOrder))
+sum(is.na(d$glottocode))
+```
+
+Missing values in fields which are used for indexing, like *glottocode* can be problematic.  For example, suppose we want to get the **ObjectVerbOrder** of the lagnuage Aari with glottocode "aari1239":
+
+```{r}
+d[d$glottocode=="aari1239", ]$ObjectVerbOrder
+```
+
+Even though there's only 1 data point with the glottocode "aari1239", we still get a list of 8 objects.  In fact, we get an NA returned for every NA glottocode.
+
+There are two ways to handle this.  Either remove the NAs *in situ* using `is.na`, or remove NAs from the data frame.  The former takes up less memory, but look messier.
+
+```{r}
+# in situ:
+d[!is.na(d$glottocode) & d$glottocode=="aari1239", ]$ObjectVerbOrder
+
+# remove NAs:
+d2 <- d[!is.na(d$glottocode),]
+d2[d2$glottocode=="aari1239",]$ObjectVerbOrder
+```
+
+
+# NaN and Inf
+
+Sometimes, calculatings can lead to unexpected results.
+
+For example, if we divide the longitude by the latitude, what is the maximum number?
+
+```{r}
+longByLat <- d$longitude / d$latitude
+head(longByLat)
+max(longByLat)
+```
+
+We get `Inf` - which represents infinity.  That's because some latitude values are 0, and when we divide any number by 0, R returns infinity.
+
+Other possible results include 'NaN' which stands for "not a number".  This can happen when a calculation has an undefined result:
+
+```{r}
+0/0
+```
+
+
+You now know enough to get this joke:
+
+```{r results="hide"}
+x = c(1,2)
+c(x[3:18], "Batman")
+```
+
+
+---
+
+Go to the [next tutorial](IntroToR_6.html)
+
+Back to the [index](../index.html)
