@@ -27,7 +27,7 @@ Data frames can be written to a csv file like this:
 write.csv(d, file="../data/myNewData.csv")
 ```
 
-If you're dealing with linguistic data, like IPA text, you might need to state that you want to write to UTF-8, which preserves the characters:
+If you're dealing with linguistic data, like IPA text, you might need to state that you want to write to UTF-8, which preserves special characters in their correct format (particularly characters with accents or diachrotics, but also emojis and special math characters):
 
 ```{r eval=F}
 write.csv(d, file="../data/myNewData.csv", fileEncoding = "UTF-8")
@@ -56,7 +56,6 @@ Note that the name of the file and the name of the object don't have to match up
 It's possible to save all objects loaded into the memory (the workspace) in a single file that you can re-open to pick up where you left off.  RStudio will give you an option to save the workspace each time it quits.  
 
 While this can be convenient, it's not recommended.  If an object is required by the script, then it should be created by the script.  It's easy to create an object, save it in the workspace, but forget to add the lines of code to the script.  When developing scripts for scientific research, you want the code to be reproducible by others.  So forcing yourself to run the script from scratch a few times is good practice.
-
 
 
 

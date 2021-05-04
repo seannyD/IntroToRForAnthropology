@@ -1584,18 +1584,13 @@ div.tocify {
 <p>It’s also useful to note that at the bottom of the page, the help file tells you which package a function belongs to. There’s a link to the package index, where you can find more functions.</p>
 <div id="manditory-and-optional-arguments" class="section level2">
 <h2><span class="header-section-number">3.1</span> Manditory and optional arguments</h2>
-<p>If we bring up the help page for <code>nchar</code>, we see that its usage is:</p>
+<p>If a function is not doing what you expect, you might look at the <strong>optional arguments</strong>.</p>
+<p>When using functions, there are mandatory arguments and there may alos be <em>optional</em> arguments. If we bring up the help page for <code>nchar</code>, we see that its usage is:</p>
 <blockquote>
 <p>nchar(x, type = “chars”, allowNA = FALSE, keepNA = FALSE)</p>
 </blockquote>
-<p>All arguments except the first one have an equal sign, then some value. These are optional arguments. It is not necessary to specify them when running a function, since they will take on the default vaules specified above. So, for example, by default, nchar returns the number of human-readable characters, but it is possible to change this to measure the number of bytes. In strings with UTF-8 characters, these can return different values:</p>
-<pre class="r"><code>nchar(&quot;Seán&quot;)</code></pre>
-<pre><code>## [1] 4</code></pre>
-<pre class="r"><code>nchar(&quot;Seán&quot;, type=&quot;char&quot;)</code></pre>
-<pre><code>## [1] 4</code></pre>
-<pre class="r"><code>nchar(&quot;Seán&quot;, type=&quot;bytes&quot;)</code></pre>
-<pre><code>## [1] 5</code></pre>
-<p>The most frequent use of optional arguments is when building graphs or when deciding how to handle NA values.</p>
+<p>All arguments except the first one have an equal sign, then some value. These are optional arguments. It is not necessary to specify them when running a function, since they will take on the default vaules specified above. So, for example, by default, <code>nchar</code> returns the number of human-readable characters (<code>type = &quot;chars&quot;</code>), but it is possible to change this to return the number of computer-readable bytes (see the help for <code>nchar</code> for more details).</p>
+<p>The most frequent use of optional arguments is when building graphs or when deciding how to handle NA values, which we’ll cover later.</p>
 </div>
 <div id="using-the-internet" class="section level2">
 <h2><span class="header-section-number">3.2</span> Using the internet</h2>

@@ -25,7 +25,7 @@ tapply(d2$latitude, d2$glotto.family, mean)
 We also learned a few basics about plots:
 
 -  How to make basic plots (figures with visual summaries of the data).
--  How colours work in R.
+-  How colours work in R (usually by setting the argument `col` to a string like "green").
 -  How to write a plot to a file on your computer (putting the plot code between a call to `pdf()` and `dev.off()`).
 
 
@@ -89,59 +89,83 @@ Suddenly, y2 includes NA values!
 
 # Data with NA values
 
-In the previous data sets we looked at, there were no missing data. Let's load a file with some missing data. Download <a href="https://raw.githubusercontent.com/seannyD/IntroToRForTheLanguageSciences/master/data/WALS_ObjectVerbOrder.csv" download>this file (WALS_ObjectVerbOrder.csv)</a> into your **data** folder.
+In the previous data sets we looked at, there were no missing data. Let's load a file with some missing data. Download <a href="https://github.com/seannyD/IntroToRForAnthropology/raw/main/data/RainfallData_all.csv" download>RainfallData_all.csv</a> this file (RainfallData_all.csv)</a> into your **data** folder.  This is mainly the same as the previous rainfall data we used. However, this data includes the full data from D-PLACE, which includes some missing data for some columns. Specifically, some languages in the new data have values for rainfall, but do not have a defined language family. For these languages, the language family is defined as "NA" (missing). Some care is needed when using data like this.
 
-This file *WALS_ObjectVerbOrder.csv* contains missing values. Create a new script called "part5.R". Now load the data, like before:
+Create a new script called "part5.R". Now load the data, like before, but load the file "RainfallData_all.csv" instead of "RainfallData_complete.csv":
 
 ```{r echo=c(2:5)}
-setwd("~/Documents/Teaching/CARDIFF/RCourse/IntroToR/analysis/")
-d = read.csv("../data/WALS_ObjectVerbOrder.csv", stringsAsFactors = F)
-dim(d)
-head(d)
+setwd("~/Documents/Teaching/CARDIFF/RCourse/IntroToRForAnthropologists/analysis/")
+rainfallData = read.csv("../data/RainfallData_all.csv", stringsAsFactors = F)
 ```
 
-We see that some of the data for the variable **ObjectVerbOrder** is missing, and also some glotto and iso codes.
+This dataset has some missing values for `language_family` and `code` (`code` is the name of the column with the measurement of the amount of rainfall).
 
-> **Task**: How many datapoints in ObjectVerbOrder are missing?  How many glottocodes are missing?  Remember that `is.na` creates a vector of booleans and `sum` can count the number of `TRUE` values in a vector.
+> **Task** What happens when you try to work out the mean rainfall in the whole dataset?
 
-```{r include=F}
-sum(is.na(d$ObjectVerbOrder))
-sum(is.na(d$glottocode))
-```
+> **Task** Which languages have the rainfall data missing?
 
-Missing values in fields which are used for indexing, like *glottocode* can be problematic.  For example, suppose we want to get the **ObjectVerbOrder** of the lagnuage Aari with glottocode "aari1239":
+> **Task**: How many datapoints in `rainfallData$language_family` and `code` are missing? Remember that `is.na` creates a vector of booleans and `sum` can count the number of `TRUE` values in a vector. And remember you can [look at the answers](../IntroToR_TaskAnswers.html) to help you.
+
+Asking the questions above is an important step in any analysis, to check that you're working with the right data.
+
+Missing values in fields which are used for indexing can lead to problems.  For example, suppose we want to get the rainfall for all languages in the "Indo-European" language family. The code below looks like it should work. Let's run it and see what happens.
 
 ```{r}
-d[d$glottocode=="aari1239", ]$ObjectVerbOrder
+rainfallData[rainfallData$language_family=="Dravidian", ]$code
 ```
 
-Even though there's only 1 data point with the glottocode "aari1239", we still get a list of 8 objects.  In fact, we get an NA returned for every NA glottocode.
+Hmm. There are only 20 Dravidian languages, but we get over 100 values back and most of them are NA.  In fact, we get an NA returned for every NA value in `language_family`. This is because indexing expects true/false (or a number), and NAs produce something else, so we get this strange behaviour.
+
+This might seem like a failing or R, but the computer is just doing what we ask. To get the result we want, we just need to be more specific.
 
 There are two ways to handle this.  Either remove the NAs *in situ* using `is.na`, or remove NAs from the data frame.  The former takes up less memory, but look messier.
 
 ```{r}
 # in situ:
-d[!is.na(d$glottocode) & d$glottocode=="aari1239", ]$ObjectVerbOrder
+# (find rows where language_family is not NA, AND where
+#    langauge_family is equal to "Dravidian")
+rainfallData[!is.na(rainfallData$language_family) &
+               rainfallData$language_family=="Dravidian", ]$code
 
 # remove NAs:
-d2 <- d[!is.na(d$glottocode),]
-d2[d2$glottocode=="aari1239",]$ObjectVerbOrder
+# Create new dataframe rainfallData2 which has no 
+#   missing values for language_family.
+rainfallData2 <- rainfallData[!is.na(rainfallData$language_family),]
+# Now get the 'code' column from this new dataframe
+rainfallData2[rainfallData2$language_family=="Dravidian",]$code
 ```
 
+Another strategy is to change the NAs to an explicit value. The code below sets any `language_family` values that are NA to be "Isolate".
 
-# NaN and Inf
+```{r eval=F}
+missing <- is.na(rainfallData$language_family)
+rainfallData[missing,]$language_family <- "Isolate"
+```
 
-Sometimes, calculatings can lead to unexpected results.
+However, this will make it look like all isolates are part of the same family. In this case, I usually set the language famiy just to be the language name (the language is part of its own family):
 
-For example, if we divide the longitude by the latitude, what is the maximum number?
+```{r eval=F}
+missing <- is.na(rainfallData$language_family)
+rainfallData[missing,]$language_family <-
+    rainfallData[missing,]$language_name
+```
+
+Note we have to index both the list we want to change and the source we want to take from, so that the rows line up.
+
+>  **Task**: Work out the mean rainfall for each language family in the data. There are a few ways to do this, and none is "better" than any other, as long as the code is clear.
+
+# Inf
+
+Sometimes, calculatings can lead to unexpected results. For example, if we divide a number by zero:
 
 ```{r}
-longByLat <- d$longitude / d$latitude
-head(longByLat)
-max(longByLat)
+100 / 2
+100 / 0
 ```
 
-We get `Inf` - which represents infinity.  That's because some latitude values are 0, and when we divide any number by 0, R returns infinity.
+We get `Inf` - which is a special R object which represents infinity.  This is technically correct, but can be confusing if we weren't expecting zeros in our data. For example, calculating the mean of anything with an `Inf` value is still `Inf`. Check that each line of code works before moving on, and if you find `Inf` in your data, check whether any calculations are dividing by zero.
+
+# NaN
 
 Other possible results include 'NaN' which stands for "not a number".  This can happen when a calculation has an undefined result:
 
@@ -149,6 +173,17 @@ Other possible results include 'NaN' which stands for "not a number".  This can 
 0/0
 ```
 
+Or your vector has no items in it:
+
+```{r}
+# This works as expected:
+x = c(1,4,3)
+mean(x)
+# Now get mean of numbers in X if the numbers are above 10:
+mean(x[x>10])
+```
+
+There are no numbers above 10, so in the second case `mean()` is given an empty vector. There is no defined 'mean' for this case.
 
 You now know enough to get this joke:
 
@@ -157,6 +192,7 @@ x = c(1,2)
 c(x[3:18], "Batman")
 ```
 
+If you don't get the joke, try importing 60s American TV shows into your brain.
 
 ---
 

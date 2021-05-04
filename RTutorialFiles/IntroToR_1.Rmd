@@ -116,15 +116,17 @@ Let's make a list of numbers.  To do that, we use the *combine* function `c`:
 nums <- c(1,4,5,5,3)
 ```
 
-This is called a **numeric vector**.  It's an ordered sequence of numbers.  We can also run operations on this variable:
+This is called a **numeric vector**. A *vector* is just a fancy word for a list of things. In the example above, we've created an ordered sequence of numbers.  We can also run operations on this variable:
 
 ```{r}
 nums *2
 ```
 
-Note that the operation applies to **each item in the list**.
+Note that the operation applies to **each item in the vector**.
 
-Some **functions** can also be used with numeric vectors, for example getting the sum of the items.  `sum` is a function which takes one *argument* (a numeric vector), and returns the sum of all the items in that argument.
+Often, we want to do particular things with the numbers in the list, such as work out the sum or the mean.  To do this, we can use **functions**. These are little programs that take some input (called *arguments*) and produce some output.
+
+For example, `sum` is a function which takes one *argument* (a numeric vector), and returns the sum of all the items in that argument. You use the function by writing the name of the function, then adding the arguments in round brackets:
 
 ```{r}
 sum(nums)
@@ -136,8 +138,7 @@ The funciton `length` takes one argument (a numeric vector), and returns the len
 length(nums)
 ```
 
-
-We can also make a **character vector** which is just an ordered sequence of strings:
+We can also make a **character vector** which is just an ordered sequence of *character strings* (typed words). 
 
 ```{r}
 number.names <- c("one",'two','three','four','five')

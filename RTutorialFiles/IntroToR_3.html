@@ -1563,13 +1563,25 @@ secondItemByBooleanVector &lt;- myNumbers[c(FALSE,TRUE,FALSE,FALSE)]</code></pre
 <p>In part 2 we learned how to install packages for specific functions (<code>install.packages(&quot;nameOfThePackage&quot;)</code>), load packages (<code>library(nameOfThePackage)</code>), and how to get help with errors.</p>
 <p>There’s a “cheatsheet” of all the commands we use in this course <a href="../RCheatSheet.pdf">here</a>.</p>
 </div>
+<div id="reading-data" class="section level1">
+<h1><span class="header-section-number">2</span> Reading data</h1>
+<p>Before we can process data with R, we need to load it into the memory (also called “reading” the data). In R studio, you can click <em>File</em>&gt;<em>Import Dataset</em>, and you’ll see a menu where you can choose a file to load, just like in programs like Word or Excel. This is handy, but it’s more productive to write some code to load our data. There are several reasons for this:</p>
+<ul>
+<li>The only way to load data is to run code. The “Import Dataset” button just creates some code automatically and then runs the code (the code will appear in the Console if you’re interested).</li>
+<li>The “Import Dataset” button is a special feature of R studio. Not all platforms for running R have this.</li>
+<li>We want our script to reproduce all the steps in our analysis. This includes details about which file and exactly how to import it. We don’t want to keep this information in our heads - that’s stressful!</li>
+<li>We want to reduce the number of buttons we have to click to run our script. While writing the code takes a bit more time to write up front, you’ll be working on scripts over days or weeks. Running one line of code is much easier than clicking around to find the file each time.</li>
+<li>You might need to import file types that aren’t supported by the “Import Dataset” button.</li>
+</ul>
+</div>
 <div id="reading-data-from-a-csv-file" class="section level1">
-<h1><span class="header-section-number">2</span> Reading data from a csv file</h1>
-<p>In this tutorial, we’ll load some data from a file. This is as easy as running one line of code, referring to the location of the file on your computer. For example, if I have a file called “WALS_WordOrder.csv” on my desktop, I could load it with this code:</p>
-<pre class="r"><code>d &lt;- read.csv(&quot;~/Desktop/WALS_WordOrder.csv&quot;)</code></pre>
+<h1><span class="header-section-number">3</span> Reading data from a csv file</h1>
+<p>In this tutorial, we’ll look at some data from the <a href="http://d-place.org/">D-PLACE database</a> on the shape of rooves across lots of societies. The data is originally from the Ethnographic Atlas. The goal is to see whether the amount of rainfall is related to the shape of your roof (more rainfall should mean steeper rooves).</p>
+<p>To do this, we’ll load some data from a file. This is as easy as running one line of code which refers to the location of the file on your computer. For example, if I have a file called “RoofShapeData.csv” on my desktop, I could load it with this code:</p>
+<pre class="r"><code>d &lt;- read.csv(&quot;~/Desktop/RoofShapeData.csv&quot;)</code></pre>
 <p><strong>However,</strong> it’s important to keep your project files organised - we don’t want files from multiple projects all on the desktop! So we’ll have to do some preperation, which involves setting up a dedicated folder for your project and then telling R that we’ve done this.</p>
 <div id="getting-the-data" class="section level2">
-<h2><span class="header-section-number">2.1</span> Getting the data</h2>
+<h2><span class="header-section-number">3.1</span> Getting the data</h2>
 <p>First, create a folder on your computer to store data and scripts for this tutorial. I’ve put mine in the folder “~/Documents/Teaching/CARDIFF/RCourse/IntroToR”. Inside this folder create:</p>
 <ul>
 <li>A folder called “data” to store data files.</li>
@@ -1578,15 +1590,16 @@ secondItemByBooleanVector &lt;- myNumbers[c(FALSE,TRUE,FALSE,FALSE)]</code></pre
 </ul>
 <p>Next, download the data files (you may need to right-click these links and choose “save target as”):</p>
 <ul>
-<li>The file <a href="https://raw.githubusercontent.com/seannyD/IntroToRForTheLanguageSciences/master/data/WALS_WordOrder.csv" download>WALS_WordOrder.csv</a>.<br />
+<li>The file <a href="https://github.com/seannyD/IntroToRForAnthropology/raw/main/data/RoofShapeData.csv" download>RoofShapeData.csv</a>.<br />
 </li>
-<li>The file <a href="https://raw.githubusercontent.com/seannyD/IntroToRForTheLanguageSciences/master/data/Glottolog_Data.csv" download>Glottolog_Data.csv</a>.</li>
+<li>The file <a href="https://github.com/seannyD/IntroToRForAnthropology/raw/main/data/RainfallData_onlyComplete.csv" download>RainfallData_onlyComplete.csv</a>.</li>
 </ul>
-<p>(these files come from <a href="https://github.com/seannyD/IntroToRForTheLanguageSciences/tree/master/data">this GitHub repository</a>)</p>
+<p>(these files come from <a href="https://github.com/seannyD/IntroToRForAnthropology/tree/main/data">this GitHub repository</a>): <a href="https://github.com/seannyD/IntroToRForAnthropology/tree/main/data" class="uri">https://github.com/seannyD/IntroToRForAnthropology/tree/main/data</a>.</p>
 <p>Put the data files in the folder called “data”.</p>
+<p>These files are the same kinds as you can download from D-PLACE. However, I’ve edited them slightly to make things easier for this tutorial.</p>
 </div>
 <div id="setting-the-working-directory" class="section level2 tabset tabset-fade tabset-pills">
-<h2><span class="header-section-number">2.2</span> Setting the working directory</h2>
+<h2><span class="header-section-number">3.2</span> Setting the working directory</h2>
 <p>Make a new R script file in RStudio (File &gt; New File &gt; R script).</p>
 <p>When we read data, we need to tell R where the files are stored. The first step is usually to set the <strong>working directory</strong>. This sets the directory (the folder) that R will look in to find data, and to write files to.</p>
 <p>We want to set the working directory to our <strong>analysis</strong> folder, because that’s where we’ll save our scripts.</p>
@@ -1598,284 +1611,588 @@ secondItemByBooleanVector &lt;- myNumbers[c(FALSE,TRUE,FALSE,FALSE)]</code></pre
 <li>RStudio will add a line of code to the console and run it.</li>
 </ul>
 <p>For me, because I’m using a mac, it’ll look something like this:</p>
-<pre class="r"><code>setwd(&quot;~/Documents/Teaching/CARDIFF/RCourse/IntroToR/analysis&quot;)</code></pre>
+<pre class="r"><code>setwd(&quot;~/Documents/Teaching/CARDIFF/RCourse/IntroToRForAnthropologists/analysis&quot;)</code></pre>
 <p>On a windows machine, it might look something like this (note the forward slashes:</p>
 <pre class="r"><code>setwd(&quot;C:/Users/sean/Documents/R/R Course/Analysis&quot;)</code></pre>
 <p>Now copy this line of code to your script. This will mean that the first thing that your analysis script does is set the right working directory. This is important, because the working directory needs to be set each time you restart RStudio. Of course, it will only work for your specific computer, but it’s convenient for now.</p>
 <p>If it worked, you should see no complaints.</p>
 </div>
 <div id="errors" class="section level2 tabset tabset-fade tabset-pills">
-<h2><span class="header-section-number">2.3</span> Errors</h2>
+<h2><span class="header-section-number">3.3</span> Errors</h2>
 <div id="errors-1" class="section level3">
-<h3><span class="header-section-number">2.3.1</span> Errors</h3>
+<h3><span class="header-section-number">3.3.1</span> Errors</h3>
 <p>If it didn’t work, you might get an error. Click on the tabs to get hints.</p>
 </div>
 <div id="cannot-change-working-directory" class="section level3">
-<h3><span class="header-section-number">2.3.2</span> cannot change working directory</h3>
+<h3><span class="header-section-number">3.3.2</span> cannot change working directory</h3>
 <p>If the error is “cannot change working directory”, then you might have spelled the location of the folder incorrectly.</p>
 </div>
 <div id="nothing-happens" class="section level3">
-<h3><span class="header-section-number">2.3.3</span> Nothing happens</h3>
+<h3><span class="header-section-number">3.3.3</span> Nothing happens</h3>
 <p>If you see a “+” sign next to the cursor, did you include both the opening and the closing quote marks? Both the opening and the closing parentheses? If not, click inside the console window, and press the Escape key to cancel the current command. Adjust your code and try again.</p>
 </div>
 <div id="cound-not-find-function" class="section level3">
-<h3><span class="header-section-number">2.3.4</span> cound not find function</h3>
+<h3><span class="header-section-number">3.3.4</span> cound not find function</h3>
 <p>If you get an error “could not find function”, then did you spell ‘setwd’ correctly?</p>
 </div>
+<div id="i-hate-you-for-hard-coding-a-path" class="section level3">
+<h3><span class="header-section-number">3.3.5</span> I hate you for hard coding a path</h3>
+<p>Yeah, but the most common mistake students make is not setting the working directory at the start of a session, then getting confused when lines don’t run. If you want, you can surround the hard-coding with the <code>try()</code> function, so that it won’t break on someone else’s computer.</p>
+</div>
 <div id="nothing-works" class="section level3">
-<h3><span class="header-section-number">2.3.5</span> Nothing works!</h3>
+<h3><span class="header-section-number">3.3.6</span> Nothing works!</h3>
 <p>If you can’t get this to work, use the following line of code to read the file directly from the web, and skip to section 1.5:</p>
-<pre class="r"><code>d &lt;- read.csv(&quot;https://raw.githubusercontent.com/seannyD/IntroToRForTheLanguageSciences/master/data/WALS_WordOrder.csv&quot;, stringsAsFactors = F)</code></pre>
+<pre class="r"><code>d &lt;- read.csv(&quot;https://github.com/seannyD/IntroToRForAnthropology/raw/main/data/RoofShapeData.csv&quot;, stringsAsFactors = F)</code></pre>
 </div>
 </div>
 <div id="reading-the-data" class="section level2">
-<h2><span class="header-section-number">2.4</span> Reading the data</h2>
+<h2><span class="header-section-number">3.4</span> Reading the data</h2>
 <p>Now <strong>save your script</strong> to your <strong>analysis</strong> folder, named something like “part3.R”.</p>
 <p>Next, we can read in a csv file to an object called a <strong>data frame</strong>. Copy this line into your script, then run it in the console.</p>
-<pre class="r"><code>d &lt;- read.csv(&quot;../data/WALS_WordOrder.csv&quot;, stringsAsFactors = F)</code></pre>
+<pre class="r"><code>d &lt;- read.csv(&quot;../data/RoofShapeData.csv&quot;, stringsAsFactors = F)</code></pre>
 <p>To run a line from the script in the console, place the cursor on the line and press the “Run” button in the top right, or press Control + Enter (or Command + Enter on a Mac).</p>
 <p><strong>NOTE</strong>: The path is not the full location of the file, it is a <em>relative path</em>. The current working directory is inside the analysis folder, and the data we want is in the <strong>data</strong> folder, which is one step above this (<em>relative</em> to the working directory). The “../” part at the beginning of the file means “look in the folder above this one, find the folder called”data“, and inside that find the folder called”WALS_WordOrder.csv&quot;&quot;. This might seem complicated, but now this line of code will work on anyone’s computer (if they have the data). We’ve just made our code more <em>reproducible</em>!</p>
 <p><strong>NOTE</strong>: by default, read.csv converts some strings to <em>factors</em>, which can complicate things later on. For now, we’ll turn this off by using the <code>stringsAsFactors</code> argument. As long as you copy the code above exactly, it should work.</p>
 <p>It’s a good idea to check how big the data frame is, using <code>dim</code> (for ‘dimensions’). Since this is not a required when reproducing our analysis, you can just type and run this directly into the console:</p>
 <pre class="r"><code>dim(d)</code></pre>
-<pre><code>## [1] 940   7</code></pre>
-<p>This data frame has 940 rows and 7 columns.</p>
+<pre><code>## [1] 1134   12</code></pre>
+<p>This data frame has 1134 rows and 12 columns.</p>
 </div>
 <div id="summarising-data" class="section level2">
-<h2><span class="header-section-number">2.5</span> Summarising data</h2>
+<h2><span class="header-section-number">3.5</span> Summarising data</h2>
 <p>Data frames are 2-dimensional objects - they have rows and columns. Typically, rows are data points and columns are variables. We can look at the data in many ways.</p>
 <blockquote>
 <p><strong>Task</strong>: What happens if you type <code>d</code> into the console to see what’s inside the object <code>d</code>?</p>
 </blockquote>
 <p>The function <code>str</code> can be used to view the structure of an object:</p>
 <pre class="r"><code>str(d)</code></pre>
-<pre><code>## 'data.frame':    940 obs. of  7 variables:
-##  $ Name           : chr  &quot;Abau&quot; &quot;Abipón&quot; &quot;Abkhaz&quot; &quot;Abui&quot; ...
-##  $ glottocode     : chr  &quot;abau1245&quot; &quot;abip1241&quot; &quot;abkh1244&quot; &quot;abui1241&quot; ...
-##  $ iso_code       : chr  &quot;aau&quot; &quot;axb&quot; &quot;abk&quot; &quot;abz&quot; ...
-##  $ latitude       : num  -4 -29 43.08 -8.25 5.5 ...
-##  $ longitude      : num  141.2 -61 41 124.7 95.5 ...
-##  $ BasicWordOrder : chr  &quot;SOV&quot; &quot;SVO&quot; &quot;SOV&quot; &quot;SOV&quot; ...
-##  $ AdpositionOrder: chr  &quot;Postpositions&quot; &quot;Prepositions&quot; &quot;Postpositions&quot; &quot;No adpositions&quot; ...</code></pre>
-<p>The function <code>head</code> can be used to look at just part of the data. Here we see the data for the first 6 rows of the data frame. It’s a list of languages, with data on glottocodes, language family, geographic location and word order.</p>
+<pre><code>## 'data.frame':    1134 obs. of  12 variables:
+##  $ society_id         : chr  &quot;Ad30&quot; &quot;Ae17&quot; &quot;Aj2&quot; &quot;Ca36&quot; ...
+##  $ society_name       : chr  &quot;Digo&quot; &quot;Rega&quot; &quot;Maasi&quot; &quot;Beni-Amer&quot; ...
+##  $ society_xd_id      : chr  &quot;xd99&quot; &quot;xd135&quot; &quot;xd395&quot; &quot;xd444&quot; ...
+##  $ language_glottocode: chr  &quot;digo1243&quot; &quot;lega1249&quot; &quot;masa1300&quot; &quot;mans1267&quot; ...
+##  $ language_name      : chr  &quot;Digo&quot; &quot;Lega-Shabunda&quot; &quot;Masai&quot; &quot;Mansa'&quot; ...
+##  $ language_family    : chr  &quot;Atlantic-Congo&quot; &quot;Atlantic-Congo&quot; &quot;Nilotic&quot; &quot;Afro-Asiatic&quot; ...
+##  $ variable_id        : chr  &quot;EA082&quot; &quot;EA082&quot; &quot;EA082&quot; &quot;EA082&quot; ...
+##  $ code               : int  1 1 1 1 1 1 1 1 1 1 ...
+##  $ code_label         : chr  &quot;Rounded or semi-cylindrical&quot; &quot;Rounded or semi-cylindrical&quot; &quot;Rounded or semi-cylindrical&quot; &quot;Rounded or semi-cylindrical&quot; ...
+##  $ focal_year         : int  1890 1900 1900 1860 1930 1940 1900 1930 1950 1950 ...
+##  $ sub_case           : chr  &quot;&quot; &quot;&quot; &quot;Kisonko or Southern Masai of Tanzania&quot; &quot;&quot; ...
+##  $ comment            : chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...</code></pre>
+<p>In the output, each row summarises one of the columns in the data.</p>
+<p>The function <code>head</code> can be used to look at just part of the data. Here we see the data for the first 6 rows of the data frame.</p>
 <pre class="r"><code>head(d)</code></pre>
-<pre><code>##       Name glottocode iso_code   latitude longitude    BasicWordOrder
-## 1     Abau   abau1245      aau  -4.000000  141.2500               SOV
-## 2   Abipón   abip1241      axb -29.000000  -61.0000               SVO
-## 3   Abkhaz   abkh1244      abk  43.083333   41.0000               SOV
-## 4     Abui   abui1241      abz  -8.250000  124.6667               SOV
-## 5 Acehnese   achi1257      ace   5.500000   95.5000 No dominant order
-## 6  Achagua   acha1250      aca   4.416667  -72.2500               SVO
-##   AdpositionOrder
-## 1   Postpositions
-## 2    Prepositions
-## 3   Postpositions
-## 4  No adpositions
-## 5    Prepositions
-## 6   Postpositions</code></pre>
-<p>Rows and columns are represented. If the number of columns is too great to represent in the width of the window, then they will be added seperately below.</p>
+<pre><code>##   society_id society_name society_xd_id language_glottocode
+## 1       Ad30         Digo          xd99            digo1243
+## 2       Ae17         Rega         xd135            lega1249
+## 3        Aj2        Maasi         xd395            masa1300
+## 4       Ca36    Beni-Amer         xd444            mans1267
+## 5       Cb13    Habbaniya         xd462            nort3133
+## 6        Cb3      Songhai         xd480            koyr1242
+##             language_name language_family variable_id code
+## 1                    Digo  Atlantic-Congo       EA082    1
+## 2           Lega-Shabunda  Atlantic-Congo       EA082    1
+## 3                   Masai         Nilotic       EA082    1
+## 4                  Mansa'    Afro-Asiatic       EA082    1
+## 5   North Kordofan Arabic    Afro-Asiatic       EA082    1
+## 6 Koyraboro Senni Songhai         Songhay       EA082    1
+##                    code_label focal_year                              sub_case
+## 1 Rounded or semi-cylindrical       1890                                      
+## 2 Rounded or semi-cylindrical       1900                                      
+## 3 Rounded or semi-cylindrical       1900 Kisonko or Southern Masai of Tanzania
+## 4 Rounded or semi-cylindrical       1860                                      
+## 5 Rounded or semi-cylindrical       1930                                      
+## 6 Rounded or semi-cylindrical       1940                        Bamba division
+##   comment
+## 1        
+## 2        
+## 3        
+## 4        
+## 5        
+## 6</code></pre>
+<p>Rows and columns are represented. If the number of columns is too great to represent in the width of the window, then they will be added seperately below. This can sometimes make it a bit confusing. You can also look at the data using the <code>View</code> fuction (note capital V, and also note that this won’t update when you change the data).</p>
+<pre class="r"><code>View(d)</code></pre>
+<p>Don’t be afraid of taking a peek at the data in a spreadsheet program if you want first.</p>
+<p>Can you tell what each column represents? Here’s a summary:</p>
+<ol style="list-style-type: decimal">
+<li>“society_id”: ID for the society (D-PLACE)</li>
+<li>“society_name” Society name</li>
+<li>“society_xd_id” ID for the society (D-PLACE)</li>
+<li>“language_glottocode”: ID for the society’s language (Glottolog)</li>
+<li>“language_name” Society’s language name</li>
+<li>“language_family” Language family of the society’s language</li>
+<li>“variable_id”: ID of the roof shape variable (Ethnographic Atlas)</li>
+<li>“code”: The numeric code for the roof shape of the society (EA).</li>
+<li>“code_label”: The text label for that code (EA)</li>
+<li>“focal_year”: Year the observation was made.<br />
+</li>
+<li>“sub_case”: Note on particular society</li>
+<li>“comment”: Comments from D-PLACE or EA</li>
+</ol>
 </div>
 </div>
 <div id="indexing-data-frames" class="section level1">
-<h1><span class="header-section-number">3</span> Indexing data frames</h1>
+<h1><span class="header-section-number">4</span> Indexing data frames</h1>
 <p>We can index the data frame in different ways. When indexing 1-dimensional objects like vectors, we used square brackets with a single number. With 2-dimensional objects like data frames, we need to specify 2 indices: what rows we want, and what columns we want.</p>
-<p>For example, show row 1, column 2:</p>
+<p>For example, show row 1, column 2 (society name):</p>
 <pre class="r"><code>d[ 1 , 2 ]</code></pre>
-<pre><code>## [1] &quot;abau1245&quot;</code></pre>
+<pre><code>## [1] &quot;Digo&quot;</code></pre>
 <p>For example, show rows 1, 4 and 6, and all columns (for all columns, we leave the second argument blank):</p>
 <pre class="r"><code>d[ c(1,4,6) , ]</code></pre>
 <p>Or all rows for the 6th column:</p>
 <pre class="r"><code>d[ , 6]</code></pre>
 <p>We can also refer to columns by their names. First, we use <code>names</code> to see the names of columns:</p>
 <pre class="r"><code>names(d)</code></pre>
-<pre><code>## [1] &quot;Name&quot;            &quot;glottocode&quot;      &quot;iso_code&quot;        &quot;latitude&quot;       
-## [5] &quot;longitude&quot;       &quot;BasicWordOrder&quot;  &quot;AdpositionOrder&quot;</code></pre>
-<p>Then we get all rows of the column <strong>latitude</strong>, using the special dollar sign character <code>$</code>.</p>
-<pre class="r"><code>d$latitude</code></pre>
-<p>We assign the latitude to a variable called <code>allLatitude</code>, then get the first 3 items:</p>
-<pre class="r"><code>allLatitude &lt;- d$latitude
-allLatitude[1:3]</code></pre>
-<pre><code>## [1]  -4.00000 -29.00000  43.08333</code></pre>
-<p>There are many ways of indexing this in the same way.</p>
-<pre class="r"><code>d[1:3, ]$latitude
-d[1:3, c(&quot;latitude&quot;)]
-d$latitude[1:3]</code></pre>
-<p>The first method above is very common: First we select the rows we are interested in, including all columns. Then we ask for the <strong>latitude</strong> column using the dollar sign.</p>
-<p>The funciton <code>table</code> summarises the counts of each unique value in a variable. So we can summarise a factor such as <strong>BasicWordOrder</strong>.</p>
-<pre class="r"><code>table(d$BasicWordOrder)</code></pre>
+<pre><code>##  [1] &quot;society_id&quot;          &quot;society_name&quot;        &quot;society_xd_id&quot;      
+##  [4] &quot;language_glottocode&quot; &quot;language_name&quot;       &quot;language_family&quot;    
+##  [7] &quot;variable_id&quot;         &quot;code&quot;                &quot;code_label&quot;         
+## [10] &quot;focal_year&quot;          &quot;sub_case&quot;            &quot;comment&quot;</code></pre>
+<p>Then we get all rows of the column <strong>code_label</strong> (the text label of the roof shape), using the special dollar sign character <code>$</code>.</p>
+<pre class="r"><code>d$code_label</code></pre>
+<p>Hmm, that’s a lot of text that just came out of the console! Let’s say we want to look at the first three items in this column. There are many ways of indexing this:</p>
+<pre class="r"><code>d[1:3, ]$code_label
+d[1:3, c(&quot;code_label&quot;)]
+d$code_label[1:3]</code></pre>
+<p>The first method above is very common: First we select the rows we are interested in, including all columns. Then we ask for the <strong>code_label</strong> column using the dollar sign.</p>
+<p>The funciton <code>table</code> summarises the counts of each unique value in a variable. So we can summarise a factor such as <strong>code_label</strong> (the roof shape).</p>
+<pre class="r"><code>table(d$code_label)</code></pre>
 <pre><code>## 
-## No dominant order               OSV               OVS               SOV 
-##               113                 3                10               368 
-##               SVO               VOS               VSO 
-##               352                18                76</code></pre>
-<p>We can provide multiple arguments to <code>table</code>, which will result in contingency tables:</p>
-<pre class="r"><code>table(d$BasicWordOrder,d$AdpositionOrder)</code></pre>
-<pre><code>##                    
-##                     Inpositions No adpositions No dominant order Postpositions
-##   No dominant order           5             12                 7            44
-##   OSV                         0              0                 0             3
-##   OVS                         0              0                 0             7
-##   SOV                         2              7                13           335
-##   SVO                         0              6                28            32
-##   VOS                         0              1                 0             0
-##   VSO                         0              0                 3             4
-##                    
-##                     Prepositions
-##   No dominant order           45
-##   OSV                          0
-##   OVS                          3
-##   SOV                         11
-##   SVO                        286
-##   VOS                         17
-##   VSO                         69</code></pre>
+##              Beehive shaped                     Conical 
+##                          57                         353 
+##                        Flat                 Four slopes 
+##                          95                          88 
+##               Hemispherical                   One slope 
+##                         103                          15 
+## Rounded or semi-cylindrical          Semi-hemispherical 
+##                          38                           8 
+##                  Two slopes 
+##                         377</code></pre>
+<p>The table here is printed with the name and the number of occurances underneath. For example, we can see that e.g. 95 societies have “flat” rooves and 8 have “Semi-hemispherical”.</p>
+<p>We can provide multiple arguments to <code>table</code>, which will result in contingency tables. For example, a table of the number of roof shapes for each language family:</p>
+<pre class="r"><code>table(d$code_label,d$language_family)</code></pre>
+<pre><code>##                              
+##                                   Abkhaz-Adyge Afro-Asiatic Ainu Algic Anim
+##   Beehive shaped                2            0            5    0     0    0
+##   Conical                       3            1           33    0    17    0
+##   Flat                          2            0           24    0     0    0
+##   Four slopes                   3            0            4    0     0    0
+##   Hemispherical                 7            0           13    0     4    0
+##   One slope                     1            0            0    0     0    0
+##   Rounded or semi-cylindrical   2            0           11    0     1    0
+##   Semi-hemispherical            0            0            0    0     0    0
+##   Two slopes                   12            0            9    1     4    1
+##                              
+##                               Araucanian Arawakan Athabaskan-Eyak-Tlingit
+##   Beehive shaped                       0        0                       0
+##   Conical                              0        1                      11
+##   Flat                                 0        0                       0
+##   Four slopes                          1        2                       1
+##   Hemispherical                        0        0                       8
+##   One slope                            0        0                       0
+##   Rounded or semi-cylindrical          0        2                       0
+##   Semi-hemispherical                   0        0                       0
+##   Two slopes                           0        4                      11
+##                              
+##                               Atlantic-Congo Austroasiatic Austronesian Aymaran
+##   Beehive shaped                          27             1            3       0
+##   Conical                                137             0            2       0
+##   Flat                                    22             0            1       0
+##   Four slopes                             18             0           12       0
+##   Hemispherical                            4             0            0       0
+##   One slope                                1             2            0       0
+##   Rounded or semi-cylindrical              2             0            2       0
+##   Semi-hemispherical                       0             0            0       0
+##   Two slopes                              82            12           73       1
+##                              
+##                               Barbacoan Basque Blue Nile Mao Bororoan Caddoan
+##   Beehive shaped                      0      0             1        0       2
+##   Conical                             0      0             0        0       0
+##   Flat                                0      0             0        0       0
+##   Four slopes                         1      0             0        0       0
+##   Hemispherical                       0      0             0        0       2
+##   One slope                           0      0             0        0       0
+##   Rounded or semi-cylindrical         0      0             0        0       0
+##   Semi-hemispherical                  0      0             0        0       0
+##   Two slopes                          0      1             0        2       0
+##                              
+##                               Cariban Central Sudanic Chibchan Chicham
+##   Beehive shaped                    1               1        0       0
+##   Conical                           4              11        3       0
+##   Flat                              0               0        0       0
+##   Four slopes                       2               0        0       1
+##   Hemispherical                     0               0        0       0
+##   One slope                         0               0        0       0
+##   Rounded or semi-cylindrical       1               0        0       0
+##   Semi-hemispherical                0               0        0       0
+##   Two slopes                        3               2        2       0
+##                              
+##                               Chimakuan Chinookan Chocoan Chonan
+##   Beehive shaped                      0         0       0      0
+##   Conical                             0         0       1      0
+##   Flat                                0         0       0      0
+##   Four slopes                         0         0       0      0
+##   Hemispherical                       0         1       0      0
+##   One slope                           0         0       0      0
+##   Rounded or semi-cylindrical         0         0       0      0
+##   Semi-hemispherical                  0         0       0      2
+##   Two slopes                          1         1       0      0
+##                              
+##                               Chukotko-Kamchatkan Chumashan Cochimi-Yuman
+##   Beehive shaped                                0         0             0
+##   Conical                                       1         0             0
+##   Flat                                          1         0             0
+##   Four slopes                                   0         0             1
+##   Hemispherical                                 0         1             8
+##   One slope                                     0         0             0
+##   Rounded or semi-cylindrical                   0         0             2
+##   Semi-hemispherical                            0         0             0
+##   Two slopes                                    1         0             1
+##                              
+##                               Coosan Dizoid Dogon Dravidian Eleman Eskimo-Aleut
+##   Beehive shaped                   0      0     0         0      0            0
+##   Conical                          0      1     0         1      0            1
+##   Flat                             0      0     1         0      0            1
+##   Four slopes                      0      0     0         2      0            1
+##   Hemispherical                    0      0     0         0      0           10
+##   One slope                        0      0     0         0      0            0
+##   Rounded or semi-cylindrical      0      0     0         1      0            0
+##   Semi-hemispherical               0      0     0         0      0            2
+##   Two slopes                       1      0     0         6      1            2
+##                              
+##                               Furan Goilalan Great Andamanese Greater Kwerba
+##   Beehive shaped                  0        0                0              0
+##   Conical                         1        0                0              0
+##   Flat                            0        0                0              0
+##   Four slopes                     0        0                0              0
+##   Hemispherical                   0        0                0              0
+##   One slope                       0        0                1              0
+##   Rounded or semi-cylindrical     0        0                0              0
+##   Semi-hemispherical              0        0                0              0
+##   Two slopes                      0        1                0              1
+##                              
+##                               Guahiboan Guaicuruan Haida Heibanic Hmong-Mien
+##   Beehive shaped                      0          0     0        0          0
+##   Conical                             0          0     0        5          0
+##   Flat                                0          0     0        0          0
+##   Four slopes                         0          0     0        0          0
+##   Hemispherical                       0          0     0        0          0
+##   One slope                           0          1     0        0          0
+##   Rounded or semi-cylindrical         0          0     0        0          0
+##   Semi-hemispherical                  0          0     0        0          0
+##   Two slopes                          1          2     1        0          1
+##                              
+##                               Huavean Huitotoan Ijoid Indo-European Iroquoian
+##   Beehive shaped                    0         0     0             0         0
+##   Conical                           0         0     0             0         0
+##   Flat                              0         0     0            13         0
+##   Four slopes                       0         0     0             6         0
+##   Hemispherical                     0         0     0             0         0
+##   One slope                         0         0     0             0         0
+##   Rounded or semi-cylindrical       0         0     0             0         2
+##   Semi-hemispherical                0         0     0             0         0
+##   Two slopes                        1         1     1            26         1
+##                              
+##                               Japonic Jodi-Saliban Kadugli-Krongo Kartvelian
+##   Beehive shaped                    0            1              0          0
+##   Conical                           0            0              2          0
+##   Flat                              0            0              0          3
+##   Four slopes                       2            0              0          0
+##   Hemispherical                     0            0              0          0
+##   One slope                         0            0              0          0
+##   Rounded or semi-cylindrical       0            0              0          0
+##   Semi-hemispherical                0            0              0          0
+##   Two slopes                        0            0              0          0
+##                              
+##                               Kawesqar Keresan Khoe-Kwadi Kiowa-Tanoan Koiarian
+##   Beehive shaped                     0       0          1            0        0
+##   Conical                            0       0          0            1        0
+##   Flat                               0       5          0            6        0
+##   Four slopes                        0       0          0            0        0
+##   Hemispherical                      1       0          1            0        0
+##   One slope                          0       0          0            0        0
+##   Rounded or semi-cylindrical        0       0          0            0        0
+##   Semi-hemispherical                 0       0          1            0        0
+##   Two slopes                         0       0          0            0        2
+##                              
+##                               Kolopom Koman Koreanic Kxa Lencan
+##   Beehive shaped                    1     0        0   0      0
+##   Conical                           0     1        0   0      0
+##   Flat                              0     0        0   0      0
+##   Four slopes                       0     0        1   0      1
+##   Hemispherical                     0     0        0   1      0
+##   One slope                         0     0        0   0      0
+##   Rounded or semi-cylindrical       0     0        0   0      0
+##   Semi-hemispherical                0     0        0   0      0
+##   Two slopes                        0     0        0   0      0
+##                              
+##                               Lower Sepik-Ramu Maiduan Mailuan Mande Maningrida
+##   Beehive shaped                             0       0       0     0          0
+##   Conical                                    0       2       0    14          0
+##   Flat                                       0       0       0     7          0
+##   Four slopes                                0       0       0     1          0
+##   Hemispherical                              0       0       0     0          0
+##   One slope                                  0       0       0     0          0
+##   Rounded or semi-cylindrical                0       0       0     0          1
+##   Semi-hemispherical                         0       0       0     1          0
+##   Two slopes                                 1       0       1     0          0
+##                              
+##                               Matacoan Mayan Misumalpan Miwok-Costanoan
+##   Beehive shaped                     1     0          0               0
+##   Conical                            1     0          0               0
+##   Flat                               0     0          0               0
+##   Four slopes                        0     0          0               0
+##   Hemispherical                      0     0          0               2
+##   One slope                          0     0          0               0
+##   Rounded or semi-cylindrical        0     0          0               0
+##   Semi-hemispherical                 0     0          0               0
+##   Two slopes                         0     5          1               0
+##                              
+##                               Mixe-Zoque Mongolic Morehead-Wasur Muskogean
+##   Beehive shaped                       0        0              0         0
+##   Conical                              0        2              0         1
+##   Flat                                 0        0              0         0
+##   Four slopes                          2        0              0         0
+##   Hemispherical                        0        1              0         0
+##   One slope                            0        0              0         0
+##   Rounded or semi-cylindrical          0        0              0         0
+##   Semi-hemispherical                   0        0              0         0
+##   Two slopes                           0        1              1         2
+##                              
+##                               Nakh-Daghestanian Nambiquaran Narrow Talodi Ndu
+##   Beehive shaped                              0           1             0   0
+##   Conical                                     0           0             1   0
+##   Flat                                        1           0             0   0
+##   Four slopes                                 0           0             0   0
+##   Hemispherical                               0           0             0   0
+##   One slope                                   0           0             0   0
+##   Rounded or semi-cylindrical                 0           0             0   0
+##   Semi-hemispherical                          0           0             0   0
+##   Two slopes                                  0           0             0   2
+##                              
+##                               Nilotic Nubian Nuclear Torricelli
+##   Beehive shaped                    3      0                  0
+##   Conical                          18      1                  0
+##   Flat                              1      1                  0
+##   Four slopes                       0      0                  0
+##   Hemispherical                     6      1                  0
+##   One slope                         0      0                  0
+##   Rounded or semi-cylindrical       1      0                  0
+##   Semi-hemispherical                0      0                  0
+##   Two slopes                        0      0                  1
+##                              
+##                               Nuclear Trans New Guinea Nuclear-Macro-Je Nyimang
+##   Beehive shaped                                     0                1       0
+##   Conical                                            2                0       1
+##   Flat                                               0                0       0
+##   Four slopes                                        1                2       0
+##   Hemispherical                                      1                1       0
+##   One slope                                          0                0       0
+##   Rounded or semi-cylindrical                        1                2       0
+##   Semi-hemispherical                                 0                0       0
+##   Two slopes                                         5                2       0
+##                              
+##                               Otomanguean Palaihnihan Pama-Nyungan Pano-Tacanan
+##   Beehive shaped                        0           0            0            0
+##   Conical                               0           1            0            0
+##   Flat                                  0           0            0            0
+##   Four slopes                           0           1            0            1
+##   Hemispherical                         0           0            0            0
+##   One slope                             0           0            2            0
+##   Rounded or semi-cylindrical           0           0            1            0
+##   Semi-hemispherical                    0           0            0            0
+##   Two slopes                            3           0            0            2
+##                              
+##                               Peba-Yagua Pomoan Quechuan Sahaptian Saharan
+##   Beehive shaped                       0      0        0         0       1
+##   Conical                              0      1        0         1       2
+##   Flat                                 0      0        0         0       0
+##   Four slopes                          1      0        0         1       0
+##   Hemispherical                        0      2        0         0       0
+##   One slope                            0      0        0         0       0
+##   Rounded or semi-cylindrical          0      0        0         0       1
+##   Semi-hemispherical                   0      0        0         0       0
+##   Two slopes                           0      0        1         2       0
+##                              
+##                               Salishan Sepik Shastan Sino-Tibetan Siouan
+##   Beehive shaped                     0     0       0            0      0
+##   Conical                            3     0       0            0      4
+##   Flat                               0     0       0            1      0
+##   Four slopes                        4     0       0            2      0
+##   Hemispherical                      0     0       0            0      6
+##   One slope                          3     0       0            0      0
+##   Rounded or semi-cylindrical        0     0       0            0      0
+##   Semi-hemispherical                 0     0       0            0      0
+##   Two slopes                        11     1       1           19      1
+##                              
+##                               Songhay South Bougainville South Omotic Surmic
+##   Beehive shaped                    0                  0            0      2
+##   Conical                           1                  0            6      1
+##   Flat                              0                  0            0      0
+##   Four slopes                       0                  0            0      0
+##   Hemispherical                     0                  0            0      0
+##   One slope                         0                  0            0      0
+##   Rounded or semi-cylindrical       1                  0            0      0
+##   Semi-hemispherical                0                  0            0      0
+##   Two slopes                        0                  1            0      0
+##                              
+##                               Ta-Ne-Omotic Tai-Kadai Tamaic Tarascan
+##   Beehive shaped                         2         0      0        0
+##   Conical                                5         0      0        0
+##   Flat                                   0         0      0        0
+##   Four slopes                            0         0      0        1
+##   Hemispherical                          0         0      1        0
+##   One slope                              0         0      0        0
+##   Rounded or semi-cylindrical            0         1      0        0
+##   Semi-hemispherical                     0         0      0        0
+##   Two slopes                             0         1      0        0
+##                              
+##                               Ticuna-Yuri Totonacan Tsimshian Tucanoan Tungusic
+##   Beehive shaped                        0         0         0        0        0
+##   Conical                               0         0         0        0        3
+##   Flat                                  0         0         0        0        0
+##   Four slopes                           1         1         0        0        0
+##   Hemispherical                         0         0         0        0        0
+##   One slope                             0         0         0        0        0
+##   Rounded or semi-cylindrical           0         0         0        0        0
+##   Semi-hemispherical                    0         0         0        0        0
+##   Two slopes                            0         0         1        1        4
+##                              
+##                               Tupian Turkic Tuu Uralic Uto-Aztecan Wakashan
+##   Beehive shaped                   0      0   0      0           0        0
+##   Conical                          0      0   0      4          32        0
+##   Flat                             0      2   0      0           2        0
+##   Four slopes                      3      2   0      1           3        0
+##   Hemispherical                    0      1   0      0          17        0
+##   One slope                        0      0   0      0           0        1
+##   Rounded or semi-cylindrical      2      0   0      0           0        0
+##   Semi-hemispherical               0      0   1      0           0        0
+##   Two slopes                       5      6   0     11           7        4
+##                              
+##                               Western Tasmanian Wintuan Yanomamic Yeniseian
+##   Beehive shaped                              0       0         0         0
+##   Conical                                     0       2         1         0
+##   Flat                                        0       0         0         1
+##   Four slopes                                 0       0         1         0
+##   Hemispherical                               0       1         0         0
+##   One slope                                   0       0         2         0
+##   Rounded or semi-cylindrical                 0       0         0         0
+##   Semi-hemispherical                          1       0         0         0
+##   Two slopes                                  0       0         0         0
+##                              
+##                               Yokutsan Yukaghir Yuki-Wappo Zamucoan
+##   Beehive shaped                     0        0          0        0
+##   Conical                            1        1          3        0
+##   Flat                               0        0          0        0
+##   Four slopes                        0        0          0        0
+##   Hemispherical                      1        0          1        0
+##   One slope                          0        0          0        1
+##   Rounded or semi-cylindrical        1        0          0        0
+##   Semi-hemispherical                 0        0          0        0
+##   Two slopes                         0        0          0        0</code></pre>
+<p>For example, Uto-Aztecan has mainly Conical and Hemispherical rooves.</p>
+<div id="sub-sets-of-the-data" class="section level2">
+<h2><span class="header-section-number">4.1</span> Sub-sets of the data</h2>
+<p>Our roof shape data observations come from focal years as early as 2000 BC. However, our rainfall data only relates to more recent times. Let’s say we want to look at all data where the focal year is greater than 1850.</p>
 <blockquote>
-<p><strong>Task</strong>: Make a boolean vector which is <code>TRUE</code> if the latitude of a language is greater than 0, and <code>FALSE</code> otherwise. Assign this to a variable named <code>northernHemisphere</code> (create a variable called <code>northernHemisphere</code> and store the boolean vector inside it).</p>
+<p><strong>Task</strong>: Make a boolean vector which is <code>TRUE</code> if the <code>focal_year</code> variable is greater than 1850, and <code>FALSE</code> otherwise. Assign this to a variable named <code>recentFocalYears</code> (create a variable called <code>recentFocalYears</code> and store the boolean vector inside it).</p>
 </blockquote>
 <blockquote>
-<p><strong>Task</strong>: Make a table of counts of basic word order types for languages in the northern hemisphere. <em>Hint</em>: you should index the rows with the variable northernHemisphere and the <strong>BasicWordOrder</strong> column.</p>
+<p><strong>Task</strong>: Make a table of counts of roof shape types for languages in the recent data. <em>Hint</em>: you should index the rows with the variable recentFocalYears and the <strong>code_label</strong> column.</p>
 </blockquote>
+</div>
 <div id="making-a-new-variable-inside-a-data-frame" class="section level2">
-<h2><span class="header-section-number">3.1</span> Making a new variable inside a data frame</h2>
-<p>In the code above, we made variable called <code>northernHemisphere</code>. Instead of doing this, we can add this directly to the data frame as follows:</p>
-<pre class="r"><code>d$NHemisphere &lt;- d$latitude &gt; 0
+<h2><span class="header-section-number">4.2</span> Making a new variable inside a data frame</h2>
+<p>In the code above, we made variable called <code>northernHemisphere</code>. Instead of doing this, we can add a new column directly to the data frame as follows:</p>
+<pre class="r"><code>d$recentFocalYears &lt;- d$focal_year &gt; 1850
 head(d)</code></pre>
-<pre><code>##       Name glottocode iso_code   latitude longitude    BasicWordOrder
-## 1     Abau   abau1245      aau  -4.000000  141.2500               SOV
-## 2   Abipón   abip1241      axb -29.000000  -61.0000               SVO
-## 3   Abkhaz   abkh1244      abk  43.083333   41.0000               SOV
-## 4     Abui   abui1241      abz  -8.250000  124.6667               SOV
-## 5 Acehnese   achi1257      ace   5.500000   95.5000 No dominant order
-## 6  Achagua   acha1250      aca   4.416667  -72.2500               SVO
-##   AdpositionOrder NHemisphere
-## 1   Postpositions       FALSE
-## 2    Prepositions       FALSE
-## 3   Postpositions        TRUE
-## 4  No adpositions       FALSE
-## 5    Prepositions        TRUE
-## 6   Postpositions        TRUE</code></pre>
-<p>How many languages are in the North-Eastern quadrant of the Earth? For this we need to find langauges which are in the Northern Hemisphere, and which have a longitude greater than one.</p>
-<p>We can combine boolean values with boolean operators like <code>&amp;</code> (and) and <code>|</code> (or):</p>
+<pre><code>##   society_id society_name society_xd_id language_glottocode
+## 1       Ad30         Digo          xd99            digo1243
+## 2       Ae17         Rega         xd135            lega1249
+## 3        Aj2        Maasi         xd395            masa1300
+## 4       Ca36    Beni-Amer         xd444            mans1267
+## 5       Cb13    Habbaniya         xd462            nort3133
+## 6        Cb3      Songhai         xd480            koyr1242
+##             language_name language_family variable_id code
+## 1                    Digo  Atlantic-Congo       EA082    1
+## 2           Lega-Shabunda  Atlantic-Congo       EA082    1
+## 3                   Masai         Nilotic       EA082    1
+## 4                  Mansa'    Afro-Asiatic       EA082    1
+## 5   North Kordofan Arabic    Afro-Asiatic       EA082    1
+## 6 Koyraboro Senni Songhai         Songhay       EA082    1
+##                    code_label focal_year                              sub_case
+## 1 Rounded or semi-cylindrical       1890                                      
+## 2 Rounded or semi-cylindrical       1900                                      
+## 3 Rounded or semi-cylindrical       1900 Kisonko or Southern Masai of Tanzania
+## 4 Rounded or semi-cylindrical       1860                                      
+## 5 Rounded or semi-cylindrical       1930                                      
+## 6 Rounded or semi-cylindrical       1940                        Bamba division
+##   comment recentFocalYears
+## 1                     TRUE
+## 2                     TRUE
+## 3                     TRUE
+## 4                     TRUE
+## 5                     TRUE
+## 6                     TRUE</code></pre>
+<p>How many societies are coded between 1900 and 1920? This requires two boolean tests.</p>
+<p>We can combine boolean values with boolean operators like <code>&amp;</code> (and) , <code>|</code> (or):</p>
 <pre class="r"><code># AND
 c(TRUE, TRUE, FALSE) &amp; c(TRUE, FALSE, FALSE)</code></pre>
 <pre><code>## [1]  TRUE FALSE FALSE</code></pre>
 <pre class="r"><code># OR
 c(TRUE, TRUE, FALSE) | c(TRUE, FALSE, FALSE)</code></pre>
 <pre><code>## [1]  TRUE  TRUE FALSE</code></pre>
-<p>The code below makes a variable which is <code>TRUE</code> only when the latitude is greater than 0 and the longitude is greater than zero. We then take the <code>sum</code> of this, which tells us how many items in this variable are <code>TRUE</code>.</p>
-<pre class="r"><code>northEastQ &lt;- d$latitude&gt;0 &amp; d$longitude &gt; 0
+<p>The code below makes a boolean vector which is <code>TRUE</code> only when the facal year is greater than 1899 <strong>and</strong> the focal year is less than 1921. We can then take the <code>sum</code> of this variable to count the number of <code>TRUE</code> values (<code>TRUE</code> is treated as 1 and <code>FALSE</code> as zero).</p>
+<pre class="r"><code>northEastQ &lt;- d$focal_year &gt; 1899 &amp; d$focal_year &lt; 1921
 sum(northEastQ)</code></pre>
-<pre><code>## [1] 396</code></pre>
-<p>Similarly, we could look at the table of basic word order types for the North-Eastern quadrant:</p>
-<pre class="r"><code>table(d[d$latitude&gt;0 &amp; d$longitude , ]$BasicWordOrder)</code></pre>
-<pre><code>## 
-## No dominant order               OVS               SOV               SVO 
-##                71                 3               226               210 
-##               VOS               VSO 
-##                10                66</code></pre>
+<pre><code>## [1] 376</code></pre>
 </div>
 <div id="combining-data-from-different-sources" class="section level2">
-<h2><span class="header-section-number">3.2</span> Combining data from different sources</h2>
-<p>We’d like to know the languaage family associated with each langauge, according to the glottolog database. The file <code>data/Glottolog_Data.csv</code> includes the language family of each language in the WALS data above. We should be able to match up the data in the two databases using the glottocode.</p>
-<p>That is, we want to match the glottolog codes in the WALS data to the glottolog codes in the Glottolog data, then add the language family from Glottolog into the WALS data frame.</p>
+<h2><span class="header-section-number">4.3</span> Combining data from different sources</h2>
+<p>Merging two sources of data is one of the most powerful skills you can gain from coding. This will allow you to compare data from different sources. To achieve this, the data must contain information on how to cross-reference. This is typically an ID (identification) which will be a unique combinations of letters and numbers for each society. For example, eHRAF uses two letters and two numbers to refer to cultures (e.g. Tudor Britain is “ES14”), and Glottolog uses four letters and four numbers to refer to languages (e.g. Welsh is “wels1247”). We can use R to match data across two files and join them together.</p>
+<p>We’d like to compare the roof shapes of societies to the rainfall for that area. But the data for rainfall exists in another file. Both files can be cross-referenced through the <code>society_id</code> variable, which refers to the society that has been coded.</p>
+<p>We want to match the society_id in the roof shape data to the society_id in the rainfall data, then add the numeric rainfall data into the roof shape data frame.</p>
 <blockquote>
-<p><strong>Task</strong>: Load the data in <code>data/Glottolog_Data.csv</code> into a data frame called glottoData.</p>
+<p><strong>Task</strong>: Load the data in <code>../data/RainfallData_onlyComplete.csv</code> into a data frame called <code>rainfallData</code>. This includes the Monthly Mean Precipitation.</p>
 </blockquote>
 <blockquote>
-<p><strong>Task</strong> What are the names and formats of the variables in glottoData?</p>
+<p><strong>Task</strong> What are the names and formats of the variables in rainfallData? What is the name of the column that includes the numeric amount of rainfall?</p>
 </blockquote>
 <div id="using-names" class="section level3">
-<h3><span class="header-section-number">3.2.1</span> Using names</h3>
-<p>If we’re sure that a variable has no repeated values, then we can use naming to combine data. First we assign names to the rows of our data frame:</p>
-<pre class="r"><code>rownames(glottoData) &lt;- glottoData$glotto.code
-head(glottoData)</code></pre>
-<pre><code>##          glotto.code     glotto.name   glotto.family             area
-## wint1259    wint1259           Wintu         Wintuan       California
-## timn1235    timn1235           Timne  Atlantic-Congo African Savannah
-## bara1380    bara1380 Barasana-Eduria        Tucanoan NE South America
-## copa1236    copa1236 Copainalá Zoque      Mixe-Zoque      Mesoamerica
-## pero1241    pero1241            Pero    Afro-Asiatic African Savannah
-## west2600    west2600     West Makian North Halmahera          Oceania</code></pre>
-<p>We can see that the rownames on the far left have changed to be the glotto codes. We can now index the <code>glottoData</code> with names:</p>
-<pre class="r"><code>glottoData[&quot;achi1257&quot;,]</code></pre>
-<pre><code>##          glotto.code glotto.name glotto.family           area
-## achi1257    achi1257    Achinese  Austronesian Southeast Asia</code></pre>
-<pre class="r"><code># The first two codes in d:
-d$glottocode[1:2]</code></pre>
-<pre><code>## [1] &quot;abau1245&quot; &quot;abip1241&quot;</code></pre>
-<pre class="r"><code># the rows in glottoData corresponding to the first two codes in d:
-glottoData[d$glottocode[1:2], ]</code></pre>
-<pre><code>##          glotto.code glotto.name glotto.family               area
-## abau1245    abau1245        Abau         Sepik N Coast New Guinea
-## abip1241    abip1241      Abipon    Guaicuruan   SE South America</code></pre>
-<p>The code below makes a new variable in <code>d</code> called <strong>family</strong>, and assigns to it: glottoData, selecting rows by names according to the glottocode, then selecting the column <strong>glotto.family</strong>.</p>
-<pre class="r"><code>d$family &lt;- glottoData[d$glottocode,]$glotto.family
-head(d)</code></pre>
-<pre><code>##       Name glottocode iso_code   latitude longitude    BasicWordOrder
-## 1     Abau   abau1245      aau  -4.000000  141.2500               SOV
-## 2   Abipón   abip1241      axb -29.000000  -61.0000               SVO
-## 3   Abkhaz   abkh1244      abk  43.083333   41.0000               SOV
-## 4     Abui   abui1241      abz  -8.250000  124.6667               SOV
-## 5 Acehnese   achi1257      ace   5.500000   95.5000 No dominant order
-## 6  Achagua   acha1250      aca   4.416667  -72.2500               SVO
-##   AdpositionOrder NHemisphere            family
-## 1   Postpositions       FALSE             Sepik
-## 2    Prepositions       FALSE        Guaicuruan
-## 3   Postpositions        TRUE      Abkhaz-Adyge
-## 4  No adpositions       FALSE Timor-Alor-Pantar
-## 5    Prepositions        TRUE      Austronesian
-## 6   Postpositions        TRUE          Arawakan</code></pre>
-<p>However, this method relies on having no missing data and unique rownames, so better options are below:</p>
+<h3><span class="header-section-number">4.3.1</span> Using names</h3>
+<p>It is possible to match ata frames using rownames. However, this assumes that rom ids are unique and that there are no missing values. So this is not reccommended.</p>
 </div>
 <div id="using-match" class="section level3">
-<h3><span class="header-section-number">3.2.2</span> Using <code>match</code></h3>
+<h3><span class="header-section-number">4.3.2</span> Using <code>match</code></h3>
 <p><code>match</code> is a function which takes two arguments: a vector of things to be matched, and a vector of values to be matched against. For each item of the first vector, it returns the <em>index</em> of that item in the second vector:</p>
 <pre class="r"><code>match(c(3,5,2), c(2,3,5))</code></pre>
 <pre><code>## [1] 2 3 1</code></pre>
-<p>That is, 3 is the second item in the second vector, 5 is the 3rd item in the second vector and 2 is the 1st item in the second vector.</p>
+<p>That is, 3 is the second item in the second vector, 5 is the 3rd item in the second vector and 2 is the 1st item in the second vector. This applies to any type of data:</p>
 <pre class="r"><code>match(c(&quot;c&quot;,&quot;b&quot;,&quot;b&quot;,'a'), c(&quot;a&quot;,&quot;b&quot;,&quot;c&quot;))</code></pre>
 <pre><code>## [1] 3 2 2 1</code></pre>
-<p>If we have three glottocodes:</p>
-<pre class="r"><code>gx &lt;- c(&quot;paiw1248&quot;, &quot;icel1247&quot;, &quot;port1285&quot;)</code></pre>
-<p>We can use match to get the families of these languages. The code below asks to find where the codes in <code>gx</code> are in the glottoData variable <strong>glotto.code</strong>. These are the <em>row numbers</em> where the glotto codes correspond. It then uses these row numbers to index glottoData and return the <strong>glotto.family</strong> variable:</p>
+<p>If we have three society ids:</p>
+<pre class="r"><code>sx &lt;- c(&quot;Ad30&quot;, &quot;Ae17&quot;, &quot;Aj2&quot;)</code></pre>
+<p>We can use match to get the rainfall of these societies The code below asks to find where the codes in <code>gx</code> are in the rainfall data variable <strong>rainfallData</strong>. These are the <em>row numbers</em> where the society ids correspond. It then uses these row numbers to index rainfallData and return the <strong>code</strong> variable:</p>
 <pre class="r"><code># example of what match returns:
-match(gx,glottoData$glotto.code)</code></pre>
-<pre><code>## [1] 794 519 445</code></pre>
-<pre class="r"><code>glottoData[match(gx,glottoData$glotto.code), ]$glotto.family</code></pre>
-<pre><code>## [1] &quot;Austronesian&quot;  &quot;Indo-European&quot; &quot;Austronesian&quot;</code></pre>
-<p>We can match every item in <code>d</code> and make a new variable this way:</p>
-<pre class="r"><code>d$family &lt;- glottoData[match(d$glottocode, glottoData$glotto.code) , ]$glotto.family</code></pre>
+match(sx,rainfallData$society_id)</code></pre>
+<pre><code>## [1]  955 1699  563</code></pre>
+<pre class="r"><code># Get rainfall for each member of 
+rainfallData[match(sx,rainfallData$society_id), ]$code</code></pre>
+<pre><code>## [1]  96037.26 193073.32  62002.16</code></pre>
+<p>We can match every item in <code>d</code> and make a new column called <code>rainfall</code> this way:</p>
+<pre class="r"><code>d$rainfall &lt;- rainfallData[match(d$society_id, rainfallData$society_id) , ]$code</code></pre>
 </div>
 <div id="using-merge" class="section level3">
-<h3><span class="header-section-number">3.2.3</span> Using <code>merge</code></h3>
-<p>Two data frames can be merged using <code>merge</code> and specifying which columns should be used to align the data.</p>
-<p>The code below makes a new variable <code>d2</code> which merges <code>d</code> and <code>glottoData</code> by matching on the glottolog code. Note that the name of the variable in each database is different, so we have to give both seperately.</p>
-<pre class="r"><code>d2 &lt;- merge(d, glottoData, by.x='glottocode', by.y='glotto.code')
-head(d2)</code></pre>
-<pre><code>##   glottocode     Name iso_code   latitude longitude BasicWordOrder
-## 1   abau1245     Abau      aau  -4.000000  141.2500            SOV
-## 2   abip1241   Abipón      axb -29.000000  -61.0000            SVO
-## 3   abkh1244   Abkhaz      abk  43.083333   41.0000            SOV
-## 4   abui1241     Abui      abz  -8.250000  124.6667            SOV
-## 5   acat1239 Tlapanec      tcf  17.083333  -99.0000            VSO
-## 6   acha1250  Achagua      aca   4.416667  -72.2500            SVO
-##   AdpositionOrder NHemisphere            family      glotto.name
-## 1   Postpositions       FALSE             Sepik             Abau
-## 2    Prepositions       FALSE        Guaicuruan           Abipon
-## 3   Postpositions        TRUE      Abkhaz-Adyge        Abkhazian
-## 4  No adpositions       FALSE Timor-Alor-Pantar             Abui
-## 5    Prepositions        TRUE       Otomanguean Acatepec Me'phaa
-## 6   Postpositions        TRUE          Arawakan          Achagua
-##       glotto.family                area
-## 1             Sepik  N Coast New Guinea
-## 2        Guaicuruan    SE South America
-## 3      Abkhaz-Adyge Greater Mesopotamia
-## 4 Timor-Alor-Pantar  N Coast New Guinea
-## 5       Otomanguean        N Coast Asia
-## 6          Arawakan    NE South America</code></pre>
-<p>Note that <code>d2</code> includes both columns in <code>glottoData</code> (the name of the language according to glottolog and the name of the language family), not just the family.</p>
-<blockquote>
-<p><strong>Task</strong>: Could you match the databases on the name of the language? Use <code>d2</code> to find how many languages have different names in Glottolog versus WALS.</p>
-</blockquote>
+<h3><span class="header-section-number">4.3.3</span> Using <code>merge</code></h3>
+<p>Two data frames can be merged using <code>merge</code> and specifying which columns should be used to align the data. This is simpler to write, but results in a data frame with all information from both sources. This can be a bit tricky to use if that’s not what you want to do.</p>
+<p>To use merge, it’s best to have a primary data frame with all the current columns, and a secondary data frame with only the cross-referencing variable and the new target variable (or all the variables you want to transfer. Also note that the rainfall data is stored in the variable “code”. Our roof shape data already has a variable like this, so we want to avoid confusion. Ideally, the new target variable should already be renamed in the secondary data frame:</p>
+<pre class="r"><code># Copy the 'code' column to a new column called 'rainfall'
+rainfallData$rainfall &lt;- rainfallData$code
+# Make a new secondary data frame with only the columns we want
+rf2 &lt;- rainfallData[,c(&quot;society_id&quot;,&quot;rainfall&quot;)]</code></pre>
+<p>Now we can merge the two data sources. The code below makes a new variable <code>d2</code> which merges <code>d</code> and <code>rainfallData</code> by matching on the glottolog code. Note that the name of the variable in each database can be different, so we have to give both seperately.</p>
+<pre class="r"><code>d2 &lt;- merge(d, rf2, by.x='society_id', by.y='society_id')</code></pre>
+<p>The last column of d2 should now have the rainfall data. Have a look for yourself, e.g.:</p>
+<pre class="r"><code>head(d2)</code></pre>
 <hr />
 <p>Go to the <a href="IntroToR_4.html">next tutorial</a></p>
 <p>Back to the <a href="../index.html">index</a></p>

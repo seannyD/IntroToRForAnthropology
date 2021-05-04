@@ -1,5 +1,5 @@
 ---
-title: "QMSS R Tutorial Part 8: Final Task"
+title: "R Tutorial Part 8: Final Task"
 output:
   html_document:
     code_folding: hide
@@ -7,53 +7,139 @@ output:
       before_body: header.htm
 ---
 
-If you've followed the previous tutorials, you should be able to complete the task below.  It might be a bit challenging, but try to tackle one part of the task at a time, and make sure your results are the expected ones.
+# Final Task
 
-**Task**:  The function `points` also has a `col` argument, where you can give it a vector which contains the colour for each point.  Make a map of the world with locations of languages, where the points are coloured by adposition type (variable **ObjectVerbOrder** in the file `data/WALS_ObjectVerbOrder.csv`).  The map **should not** contain languages which have no dominant order.
+The final task is to draw a map of the world with our data on it. If you've followed the previous tutorials, you should be able to complete the task below.  It might be a bit challenging, but try to tackle one part of the task at a time, and make sure your results are the expected ones.
+
+You need to know two more things to do this task:
+
+## Plotting Maps
+
+The `maps` package helps plot maps. First, make sure you've installed this package:
+
+```{r eval=F, class.source = 'fold-show'}
+install.packages("maps")
+```
+
+Then you can plot a map of the world like this:
+
+```{r, class.source = 'fold-show'}
+library(maps)
+map()
+```
+
+This produces a map of the world and displays it in the plot window.  We can add stuff on top with functions like `points` and `abline`:
+
+```{r, class.source = 'fold-show'}
+# draw a map of the world
+map() 
+# add a point at longitude 0, latitude 52
+#  (and two other arguments to make it a filled red circle)
+points(0, 52, col = 2)
+# add a horizontal line at the equator
+abline(h = 0, col = 2)
+```
+
+The function `points` can take vectors of longitudes and latitudes and plot several points at once. In some imaginary data:
+
+```{r eval=F, class.source = 'fold-show'}
+points(d$longitude, d$latitude, col = d$pointColour)
+```
+
+
+## Colours
+
+In the code above, note the extra argument in `points` and `abline` called "col". This sets which colour the point or line should be. You can give points different colours by supplying a vector of values (one for each point).
+
+Colours in R can be specified using:
+
+* Numbers referring to the default *palette*, 1 = black, 2 = red, 3 = green etc.
+* A character string of basic colour names, like "red" or "green".
+* A hex or RGB value, usually produced using a helpful function like `rainbow`, `heat.colors` or the `RColorBrewer` package.
+
+# Final Task definition
+
+The file "societies.csv" includes extra data about each society, including the geographic location (taken from D-PLACE, mainly based on Glottolog location data). The column `id` in societies.csv is an ID that can be matched to the column `society_id` in the main roof shape data. 
+
+Download societies.csv here: <a href="https://github.com/seannyD/IntroToRForAnthropology/raw/main/data/societies.csv" download>societies.csv</a>. (https://github.com/seannyD/IntroToRForAnthropology/raw/main/data/societies.csv).
+
+**Task**: Make a map of the world with a point added for each society, and where the colour of the point indicates whether it has a flat or non-flat roof. The map **should not** contain societies for which we don't have rainfall data.
 
 Write a script for this - don't try and do it directly in the console.
 
+Below is a set of steps you'll need to take. Before looking at them, see if you can work these out yourself - braking the problem down is an important skill to develop.
+
 You'll need to:
 
-* Load the WALS data
-* Filter out languages where **ObjectVerbOrder** is `No dominant order`
+* Download the "societies.csv" file and put it in your "data" folder.
+* Load the roof, rainfall and society data
+* Combine the data so that you have the roof shape, rainfall amount and geographic coordinates in one data frame. For the geographic coordinates, you might have to peek at the societies.csv data to figure out which column relates to the latitude and longitude.
+* Filter out rows where the rainfall is NA.
+* Create a new column in the dataframe which is either "Flat" or "Not Flat".
+
+Now we also need to assign a colour to each row, based on whether the rooves are flat or not flat.
+
+* Create another new column `pointColour` in the main data that is e.g. "green" if the roof type is flat and "red" if the roof type is not flat. 
+
+Now we can draw the map:
+
 * Draw a map
-* Make a vector of possible adposition types.  The function `unique` will be useful here (if you don't know what it does, look up the help page).
-* Make a vector of possible colours.  Either a numeric vector of 1, 2, 3, ... up to the number of colours, or you can use the function `rainbow`.
-* Make a vector of colours, one for each language in d2, where the colour corresponds to the adposition order.  Remember, you can do this by:
-    * indexing by name
-    * using `match`
-* Use the latter vector as the `col` arugment in `points`.
+* Draw the points. The function `points` also has a `col` argument, where you can give it a vector which contains the colour for each point. You can put the `pointColour` data here.
+* Add some code to write the map to a file
+
 
 Here's my plot, with a legend for reference.  Click on the `code` button to the right to reveal one possible answer.
 
-```{r warning=FALSE, message=FALSE}
-setwd("~/Documents/Teaching/CARDIFF/RCourse/IntroToR/analysis/")
+```{r warning=FALSE, message=FALSE,comment=FALSE}
+# Set the working directory
+setwd("~/Documents/Teaching/CARDIFF/RCourse/IntroToRForAnthropologists/analysis/")
 
+# Load the maps library
 library(maps)
 
-# state what file and variable I'm using
-filename <- "../data/WALS_ObjectVerbOrder.csv"
+#Load the roof data
+d = read.csv("../data/RoofShapeData.csv", stringsAsFactors = F)
+# Creae a variable called 'roofShape', just for convenience
+d$roofShape <- d$code_label
+# Work out flat/ non-flat
 
-#Load data
-d = read.csv(filename, stringsAsFactors = F)
+d$flatRoof = d$roofShape == "Flat"
 
-# Remove NAs
-# We can use d[,variableName] to get the object verb order
-d = d[!is.na(d$ObjectVerbOrder),]
+# Load rainfall data
+rainfallData = read.csv("../data/RainfallData_all.csv",stringsAsFactors = F)
 
-# Remove 'no dominant order'
-d = d[d$ObjectVerbOrder != "No dominant order",]
-orderTypes = unique(d$ObjectVerbOrder)
-colours = rainbow(length(orderTypes))
-names(colours) <-orderTypes
+# Add the rainfall data into the main data source
+d$rainfall <- rainfallData[match(d$society_id, rainfallData$society_id) , ]$code
 
-# draw a map
-map()
-# add points
-points(d$longitude, d$latitude, col= colours[d$ObjectVerbOrder])
-# add a legend
-legend(-45,-40, legend=orderTypes, col=colours, pch=16, ncol=2)
+# Filter out any data with NA values in rainfall
+d = d[!is.na(d$rainfall),]
+
+# Load society data
+societyData = read.csv("../data/societies.csv",stringsAsFactors = F)
+
+# Add the geographic coordinates
+d$longitude <- societyData[match(d$society_id, societyData$id) , ]$Long
+d$latitude <- societyData[match(d$society_id, societyData$id) , ]$Lat
+
+# Assign a colour based on the roof shape
+# First, we just create a new variable that is "red" for all rows:
+d$pointColour = "red"
+# Now we set any rows where the roof shape is flat to "green":
+#    (remember that 'flatRoof' is a boolean vector)
+d[d$flatRoof,]$pointColour = "green"
+
+# Create a new pdf file
+pdf("myMap.pdf", width=15, height=10)
+  # draw a map
+  map()
+  # add points
+  points(d$longitude, d$latitude, col= d$pointColour)
+  # add a legend
+  legend(-45,-40, legend=c("Flat","Not Flat"), 
+         col=c("green","red"), pch=16, ncol=2)
+# We're done with plotting, so close the file connection
+dev.off()
+
 ```
 
 ----------

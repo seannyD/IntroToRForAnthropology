@@ -175,63 +175,64 @@ Another strength of the permutation test is that it can be modified to look at d
 
 In this tutorial, we'll investigate a correlation in our data.  The hypothesis is the following:
 
-> VSO languages have longer names than SOV languages.  For example, the languages "Ik" and "So" are both VSO languages, while "Xaasongaxango" is a SOV language.
+> Societies from places with more rainfall will be less likely to have flat rooves than societies from places with less rainfall.
 
-It's a stupid hypothesis, but will help demonstrate some principles.
+This is not very well based in theory, but the aim is to demonstrate some principles of how permutation works.
 
-First we load and merge our data, then filter out all except languages with VOS or SOV.
+First we load and merge our data
 
 ```{r}
 # set working directory
-setwd("~/Documents/Teaching/CARDIFF/RCourse/IntroToR/analysis/")
-# load data
-d <- read.csv("../data/WALS_WordOrder.csv", stringsAsFactors = F)
-glottoData <- read.csv("../data/Glottolog_Data.csv", stringsAsFactors = F)
-# merge two data frames
-d <- merge(d, glottoData, by.x='glottocode', by.y='glotto.code')
+setwd("~/Documents/Teaching/CARDIFF/RCourse/IntroToRForAnthropologists/analysis/")
 
-# only VSO or SOV languages
-d2 <- d[d$BasicWordOrder %in% c("VSO","SOV"),]
+#Load the roof data
+d = read.csv("../data/RoofShapeData.csv", stringsAsFactors = F)
+# Creae a variable called 'roofShape'
+# (no space so we can tell the difference in a list)
+d$roofShape = "NotFlat"
+d[d$code_label=="Flat",]$roofShape = "Flat"
 
+# Load rainfall data
+rainfallData = read.csv("../data/RainfallData_all.csv",stringsAsFactors = F)
+
+# Add the rainfall data into the main data source
+d$rainfall <- rainfallData[match(d$society_id, rainfallData$society_id) , ]$code
 # get rid of NA values
-d2 <- d2[complete.cases(d2),]
+d = d[!is.na(d$rainfall),]
+# Set isolates to have language family of their own
+d[d$language_family=="",]$language_family =
+  d[d$language_family=="",]$language_name
+
+# Load society data
+societyData = read.csv("../data/societies.csv",stringsAsFactors = F)
+
+# Add the geographic coordinates
+d$longitude <- societyData[match(d$society_id, societyData$id) , ]$Long
+d$latitude <- societyData[match(d$society_id, societyData$id) , ]$Lat
 ```
 
-Next we have to convert the *BasicWordOrder* variable to a **factor**.  This is a data type which recognises that the items represent discrete categories, rather than continuous numbers or a string of characters.
+Next we have to convert the *roofShape* variable to a **factor**.  This is a data type which recognises that the items represent discrete categories, rather than continuous numbers or a string of characters.
 
 ```{r}
 # convert to factors
-d2$BasicWordOrder = factor(d2$BasicWordOrder)
-head(d2$BasicWordOrder)
+d$roofShape = factor(d$roofShape)
+head(d$roofShape)
 ```
 
-Next we want our dependent measure - the length of language names:
+So, do flat rooves get more rainfall?
 
 ```{r}
-d2$Name.length <- nchar(d2$Name)
-
-```
-
-So, do VSO languages have longer names?
-
-```{r}
-t.test(d2$Name.length~d2$BasicWordOrder)
+t.test(d$rainfall~d$roofShape)
 ```
 
 The pattern certainly seems strong - but we can't see whether the languages are related.  Indeed, when we draw a map of the basic word order data, we notice that there are large geogrpahic areas of similar types:
 
 ```{r echo=FALSE}
-orderTypes = unique(paste(d2$BasicWordOrder))
-colours = rainbow(length(orderTypes))
-names(colours) <-orderTypes
-
 library(maps)
 # draw a map
 map()
 # add points
-points(d2$longitude, d2$latitude, col= colours[d2$BasicWordOrder], pch=16)
-# add a legend
-legend(-45,-40, legend=orderTypes, col=colours, pch=16, ncol=2)
+points(d$longitude, d$latitude, col= 4-as.numeric(d$roofShape))
 ```
 
 We can use several methods to try and control for the geographic relatedness of languages.
@@ -241,8 +242,7 @@ We can use several methods to try and control for the geographic relatedness of 
 
 Recall that a basic step in the permutation test is measuring the strength of the relationship between two variables.  In the section above with two continuous variables, we used the correlation coefficient.  In this section, our prediction is that there is a difference in the means of the two groups.
 
-So let's measure the real difference in means between SVO and VSO languages:
-
+So let's measure the real difference in means between flat and non-flat rooved socieitis:
 
 ```{r}
 # function that takes a vector of numbers and a vector of what group each number belongs to, and works out the difference in means between them.
@@ -250,7 +250,7 @@ getDifferenceInMeans <- function(x,group){
   diff(tapply(x, group, mean))
 }
 
-realDifferenceInMeans <- getDifferenceInMeans(d2$Name.length, d2$BasicWordOrder)
+realDifferenceInMeans <- getDifferenceInMeans(d$rainfall, d$roofShape)
 
 ```
 
@@ -270,9 +270,9 @@ permTest <- function(x,group){
 And now run this many times, and look at the results:
 
 ```{r}
-res <- replicate(1000, permTest(d2$Name.length,d2$BasicWordOrder))
+res <- replicate(1000, permTest(d$rainfall,d$roofShape))
 
-hist(res, xlim=c(-3,3))
+hist(res, xlim=c(-30000,60000))
 abline(v= realDifferenceInMeans, col=2)
 
 # Z value
@@ -320,26 +320,41 @@ unlist(tapply(myLetters,vowelOrConsonant, sample))
 
 Now note that the vowels can only trade places with anoter vowel.  Note also that the resulting vector sorts the data so that the consonants all come first.
 
-## Controlling for area
+## Controlling for language family
 
-We can now write a function which takes a vector of numbers, a vector indicating which group they belong to and a vector saying which geographic *area* they belong to, and run a structured permutation test.
+We can now write a function which takes a vector of numbers, a vector indicating which group they belong to and a vector saying which language family they belong to, and run a structured permutation test. (Maybe what we really want to do is group by climate region, but you get the idea).
 
-The function below is similar to the permutation function above, except it uses the tapply trick to permute only within areas.  Note also that the numeric vector has to be sorted by area.
+Before we proceed, there's a slight hiccup to get over: In the data we're using, there are some language families with just one society. Unfortuantely, the function `sample()` behaves weirdly if you give it a vector with just one number. In this case, it returns a sample of numbers from 1 to the number given.  So we have to make a new function that does what we want. We'll call this `sampleSimple`:
+
+```{r}
+sampleSimple = function(X,...){
+  if(length(X)==1){
+    return(X)
+  } else{
+    return(sample(X,...))
+  }
+}
+```
+
+The function below is similar to the permutation function above, except it uses the tapply trick to permute only within families  Note also that the numeric vector has to be sorted by family.
 
 ```{r}
 
-permuteWithinAreas <- function(x,group,area){
+permuteWithinFamilies <- function(x,group,family){
   # permute number
-  x <- unlist(tapply(x,area,sample))
+  x2 <- unlist(tapply(x,family,sampleSimple))
   # put group into right order
-  group <- unlist(tapply(group,area,sample))
-  permutedDifferenceInMeans <-getDifferenceInMeans(x,group)
+  group2 <- unlist(tapply(group,family,sampleSimple))
+  permutedDifferenceInMeans <-getDifferenceInMeans(x2,group2)
   return(permutedDifferenceInMeans)
 }
 
-res <- replicate(1000, permuteWithinAreas(d2$Name.length, d2$BasicWordOrder,d2$area))
+resFamily <- replicate(1000, 
+          permuteWithinFamilies(d$rainfall,
+                             d$roofShape,
+                             d$language_family))
 
-hist(res, xlim=c(-3,3))
+hist(resFamily, xlim=c(-30000,60000))
 abline(v= realDifferenceInMeans, col=2)
 
 ```
@@ -347,22 +362,21 @@ abline(v= realDifferenceInMeans, col=2)
 Note how the distribution has shifted to the right - with the test above, we're much more likely to see higher correlation values.  The reason for the difference is that we're using a different baseline to represent random chance.
 
 ```{r}
-
 # Z value
-(realDifferenceInMeans-mean(res)) / sd(res)
+(realDifferenceInMeans-mean(resFamily)) / sd(resFamily)
 
 # P value
-sum(res >= realDifferenceInMeans) / length(res)
+sum(resFamily >= realDifferenceInMeans) / length(resFamily)
 ```
 
-The result now is marginally significant.  This suggests that the length of language name really varies by geographic area, and the original result is due to basic word order also being related to geographic area.  
+The result is still significant, but the effect size  is smaller.  This suggests that there may be some geographic or historical signal in the data.  
 
 
 # Independent samples
 
 An extreme way of ensuring that your data is not affected by historical or geographical relations is only to run the test with data that you know are not related.  That is, to use a sample of independent data points.  For example, we could choose a random language from each geographic area for each basic word order type.
 
-The function `sample` has an optional parameter "size", which defines the number of random selections to return.  We can pass this to `sample` inside the `tapply` function to pick just one item from each group:
+The function `sample` has an optional parameter "size", which defines the number of random selections to return.  We can pass this to `sample` inside the `tapply` function to pick just one item from each group. (the function `sampleSimple` passes these arguments on to `sample`)
 
 ```{r echo=F}
 set.seed(765)
@@ -371,22 +385,22 @@ set.seed(765)
 
 ```{r}
 # Set up some variables
-x <- d2$Name.length
-group <- d2$BasicWordOrder
-area <- d2$area
+x <- d$rainfall
+group <- d$roofShape
+family <- d$language_family
 
 # split the numbers by group
-g1 = x[group=="SOV"]
-g2 = x[group=="VSO"]
+g1 = x[group=="Flat"]
+g2 = x[group=="NotFlat"]
 
-# split the areas by group
-a1 = area[group=="SOV"]
-a2 = area[group=="VSO"]
+# split the families by group
+a1 = family[group=="Flat"]
+a2 = family[group=="NotFlat"]
 
-# pick one number from each area for group 1
-indepSample1= tapply(g1,a1, sample, size=1)
-# pick one number from each area for group 2
-indepSample2= tapply(g2,a2, sample, size=1)
+# pick one number from each family for group 1
+indepSample1= tapply(g1,a1, sampleSimple, size=1)
+# pick one number from each family for group 2
+indepSample2= tapply(g2,a2, sampleSimple, size=1)
 
 # work out the difference in means
 indepDiff = mean(indepSample2) - mean(indepSample1)
@@ -395,13 +409,13 @@ indepDiff
 
 ```
 
-So, this tells us that the difference between SOV and VSO language names from a random independent sample is `r indepDiff` characters.  That's more than zero, but is it significantly more than zero?  What would happen if we had chosen a different random selection?  
+So, this tells us that the difference between Flat and Non-flat rooves from a random independent sample is `r indepDiff`.  That's more than zero, but is it significantly more than zero?  What would happen if we had chosen a different random selection?  
 
 We can answer these questions by running the code above many times.  First, we put the code into a custom function, then repliate it many times:
 
 ```{r}
 
-indepSample <- function(x,group,area){
+indepSample <- function(x,group,family){
   # work out what the two groups are
   groupNames = sort(unique(group))
   
@@ -409,59 +423,56 @@ indepSample <- function(x,group,area){
   g1 = x[group==groupNames[1]]
   g2 = x[group==groupNames[2]]
   
-  # split the area vairable into the two groups
-  a1 = area[group==groupNames[1]]
-  a2 = area[group==groupNames[2]]
+  # split the family vairable into the two groups
+  a1 = family[group==groupNames[1]]
+  a2 = family[group==groupNames[2]]
   
   # choose independent samples from both groups
-  indepSample1= tapply(g1,a1, sample, size=1)
-  indepSample2= tapply(g2,a2, sample, size=1)
+  indepSample1= tapply(g1,a1, sampleSimple, size=1)
+  indepSample2= tapply(g2,a2, sampleSimple, size=1)
   
   # work out difference in means
   indepDiff = mean(indepSample2) - mean(indepSample1)
   return(indepDiff)
 }
 
-res = replicate(1000, indepSample(d2$Name.length, d2$BasicWordOrder, d2$area))
+res = replicate(1000, 
+          indepSample(d$rainfall, d$roofShape, d$language_family))
 
 
 ```
 
-Let's look at the results, and determine what proportion of independent samples resulted in a difference greater than zero:
+Let's look at the results, and determine what proportion of independent samples resulted in a difference less than zero. What we're seeing here is the difference in means, where a positive value means that the Flat rooves have a higher mean rainfall than Non-flat rooves.
 
 ```{r}
-
-
 hist(res)
 abline(v= 0, col=2)
 
 # P value
-p.value <- sum(res >= 0) / length(res)
-
+p.value <- sum(res < 0) / length(res)
 p.value
-
 ```
 
-The p value is `r p.value` - not significant at all.  This suggests that the correlation between language name length and basic word order is really just driven by languages being related geographically.
+The p value is `r p.value` (or < 1/1000) - so quite significant.  This suggests that the correlation between rainfall and roof shape may not be explained away by Galton's problem.
 
 However, it's worth noting that this test is very conservative - it throws away a lot of information and runs tests on a much smaller sample of the data.  It's possible that this would lead to reduced statistical power, and an inability to detect relationships that really were there.
 
 ## Combining permutation and independent samples 
 
-In the tests above, we took one language from each area where we could.  But this results in an imbalance in the sample sizes - there are more areas with SVO languages than with VSO langauges.  Larger samples can include more extreme measures by chance, which could affect our result.  We could control for this by only selecting the same number of observations for each group.
+In the tests above, we took one society from each family where we could.  But this results in an imbalance in the sample sizes - there are more areas with non-flat rooves than with flat rooves.  Larger samples can include more extreme measures by chance, which could affect our result.  We could control for this by only selecting the same number of observations for each group.
 
 In addition, we were assuming that the difference between indpendent samples by chance was zero.
 
 We could address these shortcomings by combining independent samples and random permutation.  The idea is to take indpendent samples, then run a mini permutation test on them.
 
-In the code below, I add a function which takes indpendent samples from each area for each group, but then makes sure both samples are the same size by throwing out data from the larger group.  The data I throw out is picked randomly.
+In the code below, I add a function which takes indpendent samples from each family for each group, but then makes sure both samples are the same size by throwing out data from the larger group.  The data I throw out is picked randomly.
 
 In addition, I don't just return the difference between the means of the two samples. When I've picked my two samples, I permute one of them and then return the difference between the *real* difference and the permuted difference.
 
 Phew!  That's hard to explain in words.  Here's the code:
 
 ```{r}
-indepSample.equalSizes <- function(x,group,area){
+indepSample.equalSizes <- function(x,group,family){
   # work out what the two groups are
   groupNames = unique(group)
   
@@ -469,20 +480,20 @@ indepSample.equalSizes <- function(x,group,area){
   g1 = x[group==groupNames[1]]
   g2 = x[group==groupNames[2]]
   
-  # split the area vairable into the two groups
-  a1 = area[group==groupNames[1]]
-  a2 = area[group==groupNames[2]]
+  # split the family vairable into the two groups
+  a1 = family[group==groupNames[1]]
+  a2 = family[group==groupNames[2]]
   
   # choose independent samples from both groups
-  indepSample1= tapply(g1,a1, sample, size=1)
-  indepSample2= tapply(g2,a2, sample, size=1)
+  indepSample1= tapply(g1,a1, sampleSimple, size=1)
+  indepSample2= tapply(g2,a2, sampleSimple, size=1)
   
   # work out how many samples are in the smallest group
   chooseNum <- min(length(indepSample1),length(indepSample2))
   
   # randomly pick items from each group, so they have the same size
-  indepSample1 <- sample(indepSample1, size=chooseNum)
-  indepSample2 <- sample(indepSample2, size=chooseNum)
+  indepSample1 <- sampleSimple(indepSample1, size=chooseNum)
+  indepSample2 <- sampleSimple(indepSample2, size=chooseNum)
   
   # work out the difference in means
   indepDiff = mean(indepSample2) - mean(indepSample1)
@@ -491,7 +502,7 @@ indepSample.equalSizes <- function(x,group,area){
   
   # permute membership between samples by
   # 1) joining them together and permuting 
-  permutedSamples1and2 <- sample(c(indepSample1,indepSample2))
+  permutedSamples1and2 <- sampleSimple(c(indepSample1,indepSample2))
   # 2) splitting them into 2 new groups
   permSample1 <-permutedSamples1and2[1:chooseNum]
   permSample2 <-permutedSamples1and2[(chooseNum+1):length(permutedSamples1and2)]
@@ -510,8 +521,10 @@ If the function above returns a value greater than zero, that indicates that the
 Now we can run this many times and look at the results.  
 
 ```{r}
-res = replicate(1000, indepSample.equalSizes(d2$Name.length, d2$BasicWordOrder, d2$area))
-
+res = replicate(1000, 
+        indepSample.equalSizes(d$rainfall,
+                               d$roofShape,
+                               d$language_family))
 hist(res)
 abline(v= 0, col=2)
 
@@ -519,7 +532,9 @@ abline(v= 0, col=2)
 sum(res >= 0) / length(res)
 ```
 
-The distribution is centered around zero, indicating that the relationship is not strong:  there's almost an equal chance of the real relationship to be weaker or stronger than for the permuted data.
+The distribution is much closer to zero. The p-value higher (approaching p = 0.01), but still significant. However, the effect is now actually leaning the other way! 
+
+Comparing this result to the results above, we might conclude that part of the correlation between roof shape and rainfall is driven by cultural history and partly by an imbalance in sample size (more societies with non-flat rooves giving a wider range of rainfall). 
 
 This technique is discussed in this [supporting information](https://github.com/seannyD/ToneClimateJoLE/blob/master/AppendixResponseToHammarstrom.pdf) of [this paper](http://jole.oxfordjournals.org/content/1/1/33).
 
@@ -540,54 +555,42 @@ Next, we make two models predicting the probability of a language having SOV ord
 If the second model provides a better fit to the data, then that suggests that basic word order does help predict name length.
 
 ```{r}
-
 library(lme4)
+# Center the rainfall variable around 0:
+d$rainfall.scaled = d$rainfall-mean(d$rainfall)
 
-# Model 0 - null model with random effects for area
-m0 = lmer(Name.length  ~ 1 + (1 +BasicWordOrder | area), data=d2)
+# Model 0 - null model with random effects for family
+m0 = lmer(rainfall.scaled  ~ 1 + 
+            (1 +roofShape | language_family), data=d)
 
-# Model 1 - model with fixed effect for AdpositionOrder
-m1 = lmer(Name.length ~BasicWordOrder + (1 + BasicWordOrder | area), data=d2)
+# Model 1 - model with fixed effect for roof shape
+m1 = lmer(rainfall.scaled ~ 1 + roofShape + 
+            (1 + roofShape | language_family), data=d)
+
+# Peek at Model 1
+summary(m1)
 
 # Has the model fit improved when adding adposition order?
 anova(m0,m1)
-
 ```
 
-The second model does not improve the fit of the data.  This suggests that, if you know what area a language belongs to, then knowing the basic word order won't help you improve your guess about the language name length.  That is, language name length and basic word order are not correlated.
+The second model does improve the fit of the data.  This suggests that the relationship between roof shape and rainfall is robust.
 
-Here's a plot of the random effects, which show that in some areas, the relationship between basic word order and name length actually goes in the opposite direction to the hypothesised prediction.
+Here's a plot of the random effects, which show that for some families, the relationship goes in the opposite direction to the hypothesised prediction.
 
 ```{r}
 library(lattice)
 dotplot(ranef(m1))
 ```
 
-# Why did we find the correlation in the first place?
-
-If we look at the language names, we note that several have extra information in brackets, such as the geographic location or family, to distinguish them from similar languages.
+If we look at the variance explained by the fixed effects, however, we see that the effect size (R2m) is reasonably small compared to the whole model (R2c):
 
 ```{r}
-head(d2$Name[grepl("\\(",d2$Name)])
+library(MuMIn)
+r.squaredGLMM(m1)
 ```
 
-If we remove the text in brackets:
-
-```{r}
-d2$Name.short <- gsub("\\([^\\)]+\\)","",d2$Name)
-# remove spaces at end of word
-d2$Name.short <- gsub(" $","",d2$Name.short)
-d2$Name.short.length = nchar(d2$Name.short)
-```
-
-Then recalculate the original t-test:
-
-```{r}
-t.test(d2$Name.short.length~d2$BasicWordOrder)
-```
-
-We see there's no relationship.
-
+There are many more tests and checks that we should carry out in a real mixed effects analysis. The main point here is that we can apply a range of tests to the relationships in the data. Each of these has its own assumptions and limitations. But together, they might help us understand the data better.
 
 
 

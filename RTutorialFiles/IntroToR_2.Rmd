@@ -74,19 +74,15 @@ It's also useful to note that at the bottom of the page, the help file tells you
 
 ## Manditory and optional arguments
 
-If we bring up the help page for `nchar`, we see that its usage is: 
+If a function is not doing what you expect, you might look at the **optional arguments**.
+
+When using functions, there are mandatory arguments and there may alos be *optional* arguments.  If we bring up the help page for `nchar`, we see that its usage is: 
 
 > nchar(x, type = "chars", allowNA = FALSE, keepNA = FALSE)
 
-All arguments except the first one have an equal sign, then some value.  These are optional arguments.  It is not necessary to specify them when running a function, since they will take on the default vaules specified above.  So, for example, by default, nchar returns the number of human-readable characters, but it is possible to change this to measure the number of bytes.  In strings with UTF-8 characters, these can return different values:
+All arguments except the first one have an equal sign, then some value.  These are optional arguments.  It is not necessary to specify them when running a function, since they will take on the default vaules specified above.  So, for example, by default, `nchar` returns the number of human-readable characters (`type = "chars"`), but it is possible to change this to return the number of computer-readable bytes (see the help for `nchar` for more details). 
 
-```{r}
-nchar("Seán")
-nchar("Seán", type="char")
-nchar("Seán", type="bytes")
-```
-
-The most frequent use of optional arguments is when building graphs or when deciding how to handle NA values.
+The most frequent use of optional arguments is when building graphs or when deciding how to handle NA values, which we'll cover later.
 
 ## Using the internet
 

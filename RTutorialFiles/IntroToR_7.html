@@ -1560,7 +1560,7 @@ div.tocify {
 <p>The best way to save results is in universally readable formats, for instance csv files for data or pdf files for graphs (see the previous parts). However, R does allow saving objects directy, which is sometimes useful with very complex data types.</p>
 <p>Data frames can be written to a csv file like this:</p>
 <pre class="r"><code>write.csv(d, file=&quot;../data/myNewData.csv&quot;)</code></pre>
-<p>If you’re dealing with linguistic data, like IPA text, you might need to state that you want to write to UTF-8, which preserves the characters:</p>
+<p>If you’re dealing with linguistic data, like IPA text, you might need to state that you want to write to UTF-8, which preserves special characters in their correct format (particularly characters with accents or diachrotics, but also emojis and special math characters):</p>
 <pre class="r"><code>write.csv(d, file=&quot;../data/myNewData.csv&quot;, fileEncoding = &quot;UTF-8&quot;)</code></pre>
 </div>
 <div id="saving-an-r-object" class="section level1">

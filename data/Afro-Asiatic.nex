@@ -1,0 +1,26 @@
+#NEXUS
+  
+  BEGIN TAXA;
+  TITLE Taxa;
+  DIMENSIONS NTAX=3;
+  TAXLABELS
+mans1267
+nort3133
+taya1257
+  ;
+  END;
+  
+  
+  
+  BEGIN CHARACTERS;
+  TITLE  Character_Matrix;
+  LINK TAXA = Taxa;
+  DIMENSIONS  NCHAR=2;
+  FORMAT DATATYPE = STANDARD GAP = - MISSING = ? SYMBOLS = "  0 1";
+  MATRIX
+mans1267 00
+nort3133 00
+taya1257 00
+  
+  ;
+  

@@ -9,6 +9,8 @@ output:
       before_body: header.htm
 ---
 
+"If" and list structures are sometimes useful, but not always necessary. If you're short on time, you can skip this part.
+
 # Recap
 
 In part 5, we learned about missing values:

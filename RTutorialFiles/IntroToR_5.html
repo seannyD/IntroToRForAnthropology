@@ -1560,7 +1560,7 @@ div.tocify {
 <p>We also learned a few basics about plots:</p>
 <ul>
 <li>How to make basic plots (figures with visual summaries of the data).</li>
-<li>How colours work in R.</li>
+<li>How colours work in R (usually by setting the argument <code>col</code> to a string like “green”).</li>
 <li>How to write a plot to a file on your computer (putting the plot code between a call to <code>pdf()</code> and <code>dev.off()</code>).</li>
 </ul>
 </div>
@@ -1604,60 +1604,94 @@ y2</code></pre>
 </div>
 <div id="data-with-na-values" class="section level1">
 <h1><span class="header-section-number">3</span> Data with NA values</h1>
-<p>In the previous data sets we looked at, there were no missing data. Let’s load a file with some missing data. Download <a href="https://raw.githubusercontent.com/seannyD/IntroToRForTheLanguageSciences/master/data/WALS_ObjectVerbOrder.csv" download>this file (WALS_ObjectVerbOrder.csv)</a> into your <strong>data</strong> folder.</p>
-<p>This file <em>WALS_ObjectVerbOrder.csv</em> contains missing values. Create a new script called “part5.R”. Now load the data, like before:</p>
-<pre class="r"><code>d = read.csv(&quot;../data/WALS_ObjectVerbOrder.csv&quot;, stringsAsFactors = F)
-dim(d)</code></pre>
-<pre><code>## [1] 2679    6</code></pre>
-<pre class="r"><code>head(d)</code></pre>
-<pre><code>##                    Name glottocode iso_code  latitude  longitude
-## 1         Arapesh (Abu)       &lt;NA&gt;     &lt;NA&gt; -3.450000 142.950000
-## 2                  Aari   aari1239      aiw  6.000000  36.583333
-## 3                  Abau   abau1245      aau -4.000000 141.250000
-## 4 Arabic (Abbéché Chad)   chad1249      shu 13.833333  20.833333
-## 5                Abidji   abid1235      abi  5.666667  -4.583333
-## 6       Arabic (Beirut)   nort3139      apc 33.916667  35.500000
-##   ObjectVerbOrder
-## 1              VO
-## 2              OV
-## 3              OV
-## 4            &lt;NA&gt;
-## 5            &lt;NA&gt;
-## 6            &lt;NA&gt;</code></pre>
-<p>We see that some of the data for the variable <strong>ObjectVerbOrder</strong> is missing, and also some glotto and iso codes.</p>
+<p>In the previous data sets we looked at, there were no missing data. Let’s load a file with some missing data. Download <a href="https://github.com/seannyD/IntroToRForAnthropology/raw/main/data/RainfallData_all.csv" download>RainfallData_all.csv</a> this file (RainfallData_all.csv)</a> into your <strong>data</strong> folder. This is mainly the same as the previous rainfall data we used. However, this data includes the full data from D-PLACE, which includes some missing data for some columns. Specifically, some languages in the new data have values for rainfall, but do not have a defined language family. For these languages, the language family is defined as “NA” (missing). Some care is needed when using data like this.</p>
+<p>Create a new script called “part5.R”. Now load the data, like before, but load the file “RainfallData_all.csv” instead of “RainfallData_complete.csv”:</p>
+<pre class="r"><code>rainfallData = read.csv(&quot;../data/RainfallData_all.csv&quot;, stringsAsFactors = F)</code></pre>
+<p>This dataset has some missing values for <code>language_family</code> and <code>code</code> (<code>code</code> is the name of the column with the measurement of the amount of rainfall).</p>
 <blockquote>
-<p><strong>Task</strong>: How many datapoints in ObjectVerbOrder are missing? How many glottocodes are missing? Remember that <code>is.na</code> creates a vector of booleans and <code>sum</code> can count the number of <code>TRUE</code> values in a vector.</p>
+<p><strong>Task</strong> What happens when you try to work out the mean rainfall in the whole dataset?</p>
 </blockquote>
-<p>Missing values in fields which are used for indexing, like <em>glottocode</em> can be problematic. For example, suppose we want to get the <strong>ObjectVerbOrder</strong> of the lagnuage Aari with glottocode “aari1239”:</p>
-<pre class="r"><code>d[d$glottocode==&quot;aari1239&quot;, ]$ObjectVerbOrder</code></pre>
-<pre><code>##  [1] NA   &quot;OV&quot; NA   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA  
-## [16] NA   NA   NA   NA   NA   NA   NA   NA   NA</code></pre>
-<p>Even though there’s only 1 data point with the glottocode “aari1239”, we still get a list of 8 objects. In fact, we get an NA returned for every NA glottocode.</p>
+<blockquote>
+<p><strong>Task</strong> Which languages have the rainfall data missing?</p>
+</blockquote>
+<blockquote>
+<p><strong>Task</strong>: How many datapoints in <code>rainfallData$language_family</code> and <code>code</code> are missing? Remember that <code>is.na</code> creates a vector of booleans and <code>sum</code> can count the number of <code>TRUE</code> values in a vector. And remember you can <a href="../IntroToR_TaskAnswers.html">look at the answers</a> to help you.</p>
+</blockquote>
+<p>Asking the questions above is an important step in any analysis, to check that you’re working with the right data.</p>
+<p>Missing values in fields which are used for indexing can lead to problems. For example, suppose we want to get the rainfall for all languages in the “Indo-European” language family. The code below looks like it should work. Let’s run it and see what happens.</p>
+<pre class="r"><code>rainfallData[rainfallData$language_family==&quot;Dravidian&quot;, ]$code</code></pre>
+<pre><code>##   [1]       NA       NA       NA       NA       NA       NA       NA       NA
+##   [9]       NA       NA       NA       NA       NA       NA       NA       NA
+##  [17]       NA       NA       NA       NA       NA       NA       NA       NA
+##  [25]       NA       NA       NA       NA       NA       NA       NA       NA
+##  [33]       NA       NA       NA       NA       NA 100922.0       NA       NA
+##  [41]       NA 103422.3       NA       NA       NA       NA       NA       NA
+##  [49]       NA       NA       NA       NA       NA       NA       NA 108118.3
+##  [57] 109047.8       NA       NA       NA 112861.6       NA       NA       NA
+##  [65]       NA       NA       NA       NA       NA       NA 132169.3       NA
+##  [73] 133062.3       NA       NA 135592.9 138058.4       NA 141620.7 141620.7
+##  [81]       NA       NA       NA       NA       NA 164923.8       NA       NA
+##  [89] 178297.3 178391.2 179394.2 179394.2       NA 189398.7       NA 193003.6
+##  [97] 196914.4       NA       NA 206521.6       NA       NA</code></pre>
+<p>Hmm. There are only 20 Dravidian languages, but we get over 100 values back and most of them are NA. In fact, we get an NA returned for every NA value in <code>language_family</code>. This is because indexing expects true/false (or a number), and NAs produce something else, so we get this strange behaviour.</p>
+<p>This might seem like a failing or R, but the computer is just doing what we ask. To get the result we want, we just need to be more specific.</p>
 <p>There are two ways to handle this. Either remove the NAs <em>in situ</em> using <code>is.na</code>, or remove NAs from the data frame. The former takes up less memory, but look messier.</p>
 <pre class="r"><code># in situ:
-d[!is.na(d$glottocode) &amp; d$glottocode==&quot;aari1239&quot;, ]$ObjectVerbOrder</code></pre>
-<pre><code>## [1] &quot;OV&quot;</code></pre>
+# (find rows where language_family is not NA, AND where
+#    langauge_family is equal to &quot;Dravidian&quot;)
+rainfallData[!is.na(rainfallData$language_family) &amp;
+               rainfallData$language_family==&quot;Dravidian&quot;, ]$code</code></pre>
+<pre><code>##  [1] 100922.0 103422.3 108118.3 109047.8 112861.6 132169.3 133062.3 135592.9
+##  [9] 138058.4 141620.7 141620.7 164923.8 178297.3 178391.2 179394.2 179394.2
+## [17] 189398.7 193003.6 196914.4 206521.6</code></pre>
 <pre class="r"><code># remove NAs:
-d2 &lt;- d[!is.na(d$glottocode),]
-d2[d2$glottocode==&quot;aari1239&quot;,]$ObjectVerbOrder</code></pre>
-<pre><code>## [1] &quot;OV&quot;</code></pre>
+# Create new dataframe rainfallData2 which has no 
+#   missing values for language_family.
+rainfallData2 &lt;- rainfallData[!is.na(rainfallData$language_family),]
+# Now get the 'code' column from this new dataframe
+rainfallData2[rainfallData2$language_family==&quot;Dravidian&quot;,]$code</code></pre>
+<pre><code>##  [1] 100922.0 103422.3 108118.3 109047.8 112861.6 132169.3 133062.3 135592.9
+##  [9] 138058.4 141620.7 141620.7 164923.8 178297.3 178391.2 179394.2 179394.2
+## [17] 189398.7 193003.6 196914.4 206521.6</code></pre>
+<p>Another strategy is to change the NAs to an explicit value. The code below sets any <code>language_family</code> values that are NA to be “Isolate”.</p>
+<pre class="r"><code>missing &lt;- is.na(rainfallData$language_family)
+rainfallData[missing,]$language_family &lt;- &quot;Isolate&quot;</code></pre>
+<p>However, this will make it look like all isolates are part of the same family. In this case, I usually set the language famiy just to be the language name (the language is part of its own family):</p>
+<pre class="r"><code>missing &lt;- is.na(rainfallData$language_family)
+rainfallData[missing,]$language_family &lt;-
+    rainfallData[missing,]$language_name</code></pre>
+<p>Note we have to index both the list we want to change and the source we want to take from, so that the rows line up.</p>
+<blockquote>
+<p><strong>Task</strong>: Work out the mean rainfall for each language family in the data. There are a few ways to do this, and none is “better” than any other, as long as the code is clear.</p>
+</blockquote>
 </div>
-<div id="nan-and-inf" class="section level1">
-<h1><span class="header-section-number">4</span> NaN and Inf</h1>
-<p>Sometimes, calculatings can lead to unexpected results.</p>
-<p>For example, if we divide the longitude by the latitude, what is the maximum number?</p>
-<pre class="r"><code>longByLat &lt;- d$longitude / d$latitude
-head(longByLat)</code></pre>
-<pre><code>## [1] -41.4347826   6.0972222 -35.3125000   1.5060241  -0.8088235   1.0466830</code></pre>
-<pre class="r"><code>max(longByLat)</code></pre>
+<div id="inf" class="section level1">
+<h1><span class="header-section-number">4</span> Inf</h1>
+<p>Sometimes, calculatings can lead to unexpected results. For example, if we divide a number by zero:</p>
+<pre class="r"><code>100 / 2</code></pre>
+<pre><code>## [1] 50</code></pre>
+<pre class="r"><code>100 / 0</code></pre>
 <pre><code>## [1] Inf</code></pre>
-<p>We get <code>Inf</code> - which represents infinity. That’s because some latitude values are 0, and when we divide any number by 0, R returns infinity.</p>
+<p>We get <code>Inf</code> - which is a special R object which represents infinity. This is technically correct, but can be confusing if we weren’t expecting zeros in our data. For example, calculating the mean of anything with an <code>Inf</code> value is still <code>Inf</code>. Check that each line of code works before moving on, and if you find <code>Inf</code> in your data, check whether any calculations are dividing by zero.</p>
+</div>
+<div id="nan" class="section level1">
+<h1><span class="header-section-number">5</span> NaN</h1>
 <p>Other possible results include ‘NaN’ which stands for “not a number”. This can happen when a calculation has an undefined result:</p>
 <pre class="r"><code>0/0</code></pre>
 <pre><code>## [1] NaN</code></pre>
+<p>Or your vector has no items in it:</p>
+<pre class="r"><code># This works as expected:
+x = c(1,4,3)
+mean(x)</code></pre>
+<pre><code>## [1] 2.666667</code></pre>
+<pre class="r"><code># Now get mean of numbers in X if the numbers are above 10:
+mean(x[x&gt;10])</code></pre>
+<pre><code>## [1] NaN</code></pre>
+<p>There are no numbers above 10, so in the second case <code>mean()</code> is given an empty vector. There is no defined ‘mean’ for this case.</p>
 <p>You now know enough to get this joke:</p>
 <pre class="r"><code>x = c(1,2)
 c(x[3:18], &quot;Batman&quot;)</code></pre>
+<p>If you don’t get the joke, try importing 60s American TV shows into your brain.</p>
 <hr />
 <p>Go to the <a href="IntroToR_6.html">next tutorial</a></p>
 <p>Back to the <a href="../index.html">index</a></p>

@@ -1,5 +1,5 @@
 ---
-title: "QMSS R Tutorial: Answers to tasks"
+title: "R Tutorial: Answers to tasks"
 output: 
   html_document:
     includes:
@@ -50,48 +50,74 @@ nums[nchar(friends)>4]
 You get a lot of data printed to the screen!  Very unhelpful.
 
 
-> **Task**: Make a boolean vector which is `TRUE` if the latitude of a language is greater than 0, and `FALSE` otherwise.  Assign this to a variable named `northernHemisphere'.
+> **Task**: Make a boolean vector which is `TRUE` if the `focal_year` variable is greater than 1850, and `FALSE` otherwise.  Assign this to a variable named `recentFocalYears` (create a variable called `recentFocalYears` and store the boolean vector inside it).
 
 ```{r eval=F}
-northernHemisphere <- d$latitude > 0
+recentFocalYears <- d$focal_year > 1850
 ```
 
-
-> **Task**: Make a table of counts of basic word order types for languages in the northern hemisphere.  *Hint*: you should index the rows with the variable northernHemisphere and the **BasicWordOrder** column.
+> **Task**: Make a table of counts of roof shape types for languages in the recent data.  *Hint*: you should index the rows with the variable recentFocalYears and the **code_label** column.
 
 ```{r eval=F}
-table(d[northernHemisphere,]$BasicWordOrder)
+table(d[recentFocalYears,]$code_label)
 ```
-
 
 > **Task**: Load the data in `data/Glottolog_Data.csv` into a data frame called glottoData.
 
+```{r eval=FALSE }
+rainfallData <- read.csv("../data/RainfallData.csv", stringsAsFactors = F)
+```
+
+> **Task** What are the names and formats of the variables in rainfallData? What is the name of the column that includes the numeric amount of rainfall?
+
 ```{r eval=FALSE}
-glottoData <- read.csv("../data/Glottolog_Data.csv", stringsAsFactors = F)
+str(rainfallData)
 ```
 
-> **Task** What are the names and formats of the variables in glottoData?
+The `code` variable holds the data on rainfall)
 
-```{r eval=FALSE}
-names(glottoData)
-```
 
-> **Task**:  Could you match the databases on the name of the language?  Use `d2` to find how many languages have different names in Glottolog versus WALS.
-
-```{r eval=F}
-sum(d2$Name!=d2$glotto.name)
-```
 
 
 # Part 4
 
-> **Task**:  Which basic word order type has the higest mean latitude?
+> **Task**: Add a line to your script to make a variable in `d` named `flatRoof` that is TRUE if the roof type is "Flat" and FALSE otherwise.
+
+```{r eval=F}
+d$flatRoof <- d$roofShape == "Flat"
+```
+
+> **Task**:  Which basic word order type has the higest mean rainfall? Add this to your script
 
 
 ```{r eval=F}
-wordOrderLatitudeMEAN<- tapply(d2$latitude, d2$BasicWordOrder, mean)
-wordOrderLatitudeMEAN.sorted <- sort(wordOrderLatitudeMEAN, decreasing = TRUE)
-head(wordOrderLatitudeMEAN.sorted)
+rainfallByLangFam.MEAN <- tapply(d$rainfall, d$language_family, mean)
+rainfallByLangFam.MEAN.sorted <- sort(rainfallByLangFam.MEAN, decreasing = TRUE)
+head(rainfallByLangFam.MEAN.sorted)
+```
+
+> **Task**:  Make a boxplot showing the mean rainfall for each type of roof shape. There are lots of types, which makes the legend difficult to read. Can you make a boxplot for just the top 4 most common roof shape types?
+
+```{r eval=F}
+# Plot of all the roof shape types:
+boxplot(rainfall ~ roofShape, data = d)
+
+# Plot the 5 most common roof shapes:
+# Get a table of counts for roof shape:
+roofShapeCounts = table(d$roofShape)
+# Sort the list and take the top 4
+top4RoofShapes = sort(roofShapeCounts,decreasing = T)[1:4]
+# This is a list of numbers, but we want the NAMES of this list:
+top4RoofShapes = names(top4RoofShapes)
+# Plot the data:
+boxplot(rainfall ~ roofShape, data = d[d$roofShape %in% top4RoofShapes,])
+```
+
+
+> **Task**:  Change the colour of the line in the `abline` function to green.
+
+```{r eval=F}
+abline(h = 0, col = 'green')
 ```
 
 
@@ -101,10 +127,51 @@ head(wordOrderLatitudeMEAN.sorted)
 
 You get NA returned!
 
-
-> **Task**: How many datapoints in ObjectVerbOrder are missing?  How many glottocodes are missing?  Remember that `is.na` creates a vector of booleans and `sum` can count the number of `TRUE` values in a vector.
+> **Task** What happens when you try to work out the mean rainfall in the whole dataset?
 
 ```{r eval=F}
-sum(is.na(d$ObjectVerbOrder))
-sum(is.na(d$glottocode))
+mean(rainfallData$code)
 ```
+
+You get an NA value!
+
+> **Task** Which languages have the rainfall data missing?
+
+Here's how to get rows where `code` is NA:
+
+```{r eval=F}
+rainfallData[is.na(rainfallData$code),]
+```
+
+
+> **Task**: How many datapoints in `rainfallData$language_family` are missing? Remember that `is.na` creates a vector of booleans and `sum` can count the number of `TRUE` values in a vector.
+
+```{r eval=F}
+sum(is.na(rainfallData$language_family))
+sum(is.na(rainfallData$code))
+```
+
+
+>  **Task**: Work out the mean rainfall for each language family in the data. There are a few ways to do this, and none is "better" than any other, as long as the code is clear.
+
+If there were no NA values, then we could use a tapply function to solve this:
+
+```{r eval=F}
+tapply(rainfallData$code, rainfallData$language_family, mean)
+```
+
+But this will produce some NA values.
+
+There are a few ways to solve this. The first is to make a data frame with only rows where the `code` variable is NOT NA:
+
+```{r eval=F}
+rainfallData2 = rainfallData[!is.na(rainfallData$code),]
+tapply(rainfallData2$code, rainfallData2$language_family, mean)
+```
+
+You could also just pass the argument `na.rm=TRUE` as an extra argument to tapply. tapply passes this argument on to the function it's given. Now, `mean()` will ignore any NA values.
+
+```{r eval=F}
+tapply(rainfallData$code, rainfallData$language_family, mean, an.rm=TRUE)
+```
+
