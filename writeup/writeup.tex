@@ -1,0 +1,22 @@
+\documentclass[11pt]{amsart} 
+\usepackage{geometry}
+\geometry{a4paper}       
+\usepackage{graphicx}
+
+
+\title{Roof Shape}
+\author{Sean}
+
+\begin{document}
+\maketitle
+
+Roof shape data was taken from the Ethographic Atlas (made available by D-PLACE, see table \ref{roofFreq}). Figure \ref{tree} shows the roof shape for societies speaking Indo-European languages. The trait shows a strong phylogenetic signal (Pagel's $\lambda$ = \input{../results/IndoEuropean_RoofTypes_Lambda.txt}).
+
+\input{../results/RoofTypes_Frequency.tex}
+
+\begin{figure}[h]
+\caption{Phylogenetic tree showing roof shape}\label{tree}
+\includegraphics[width=8cm]{../results/IndoEuropean_RoofTypes.pdf}
+\end{figure}
+
+\end{document}  
