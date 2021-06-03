@@ -101,13 +101,13 @@ The first line of your script will set the working directory. You can do this us
 -  Find your analysis directory and click "open"
 -  RStudio will add a line of code to the console and run it.
 
-For me, because I'm using a mac, it'll look something like this:
+For me, because I'm using a mac, it'll look something like this (note the first character is a tilde, which indicates the current user's home directory):
 
 ```{r eval=F}
 setwd("~/Documents/Teaching/CARDIFF/RCourse/IntroToRForAnthropologists/analysis")
 ```
 
-On a windows machine, it might look something like this (note the forward slashes:
+On a windows machine, it might look something like this (note the forward slashes to separate directories - copying the path from Windows Explorer might give you backslashes, which need to be changed to forward slashes):
 
 ```{r eval=F}
 setwd("C:/Users/sean/Documents/R/R Course/Analysis")
@@ -145,9 +145,9 @@ d <- read.csv("https://github.com/seannyD/IntroToRForAnthropology/raw/main/data/
 
 ## Reading the data
 
-Now **save your script** to your **analysis** folder, named something like "part3.R".
+Now **save your script** to your **analysis** folder, named something like "part3.R". You can do this by clicking File > Save As, and choosing the location like saving many other type of files.
 
-Next, we can read in a csv file to an object called a **data frame**. Copy this line into your script, then run it in the console. 
+Next, we want to load the cultural data into R so we can analyse it. We can "read in" a csv file to an object called a **data frame**. Copy this line into your script, then run it in the console. 
 
 ```{r}
 d <- read.csv("../data/RoofShapeData.csv", stringsAsFactors = F)
@@ -344,7 +344,7 @@ str(rainfallData)
 
 ### Using names
 
-It is possible to match ata frames using rownames. However, this assumes that rom ids are unique and that there are no missing values. So this is not reccommended.
+It is possible to match data frames using rownames. However, this assumes that row ids are unique and that there are no missing values. So this is not reccommended.
 
 
 ### Using `match`
