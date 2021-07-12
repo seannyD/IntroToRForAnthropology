@@ -1635,7 +1635,7 @@ y2</code></pre>
 ##  [97] 196914.4       NA       NA 206521.6       NA       NA</code></pre>
 <p>Hmm. There are only 20 Dravidian languages, but we get over 100 values back and most of them are NA. In fact, we get an NA returned for every NA value in <code>language_family</code>. This is because indexing expects true/false (or a number), and NAs produce something else, so we get this strange behaviour.</p>
 <p>This might seem like a failing or R, but the computer is just doing what we ask. To get the result we want, we just need to be more specific.</p>
-<p>There are two ways to handle this. Either remove the NAs <em>in situ</em> using <code>is.na</code>, or remove NAs from the data frame. The former takes up less memory, but look messier.</p>
+<p>There are two ways to handle this. Either remove the NAs <em>in situ</em> using <code>is.na</code>, or remove NAs from the data frame. The former takes up less memory, but looks messier.</p>
 <pre class="r"><code># in situ:
 # (find rows where language_family is not NA, AND where
 #    langauge_family is equal to &quot;Dravidian&quot;)

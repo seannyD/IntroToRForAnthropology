@@ -118,7 +118,7 @@ Hmm. There are only 20 Dravidian languages, but we get over 100 values back and 
 
 This might seem like a failing or R, but the computer is just doing what we ask. To get the result we want, we just need to be more specific.
 
-There are two ways to handle this.  Either remove the NAs *in situ* using `is.na`, or remove NAs from the data frame.  The former takes up less memory, but look messier.
+There are two ways to handle this.  Either remove the NAs *in situ* using `is.na`, or remove NAs from the data frame.  The former takes up less memory, but looks messier.
 
 ```{r}
 # in situ:

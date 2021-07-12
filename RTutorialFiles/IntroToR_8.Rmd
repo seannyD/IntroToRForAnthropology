@@ -142,6 +142,16 @@ dev.off()
 
 ```
 
+```{r echo=F}
+  map()
+  # add points
+  points(d$longitude, d$latitude, col= d$pointColour)
+  # add a legend
+  legend(-45,-40, legend=c("Flat","Not Flat"), 
+         col=c("green","red"), pch=16, ncol=2)
+```
+
+
 ----------
 
 Back to the [index](../index.html)
